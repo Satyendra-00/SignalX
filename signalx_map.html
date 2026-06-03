@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SignalX — Delhi Signal Intelligence Map</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --panel: #0f1628;
+    --border: #1e2d4a;
+    --accent: #00e5ff;
+    --accent2: #ff6b35;
+    --green: #00ff88;
+    --yellow: #ffd600;
+    --text: #c8d8f0;
+    --text-dim: #5a7a9a;
+    --font-mono: 'Space Mono', monospace;
+    --font-ui: 'Rajdhani', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    height: 56px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    z-index: 1000;
+    flex-shrink: 0;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo-text {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 2px;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 24px;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ── Main layout ── */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 300px;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    z-index: 500;
+  }
+
+  .sidebar-section {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* Search */
+  .search-box {
+    position: relative;
+  }
+
+  .search-box input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px 8px 32px;
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-box input:focus {
+    border-color: var(--accent);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 10px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  /* Filter buttons */
+  .filter-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .filter-btn {
+    padding: 6px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    font-family: var(--font-ui);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,229,255,0.05);
+  }
+
+  .filter-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Junction list */
+  .junction-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+  }
+
+  .junction-list::-webkit-scrollbar { width: 4px; }
+  .junction-list::-webkit-scrollbar-track { background: transparent; }
+  .junction-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .junction-item {
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 2px;
+    border: 1px solid transparent;
+  }
+
+  .junction-item:hover {
+    background: rgba(0,229,255,0.05);
+    border-color: var(--border);
+  }
+
+  .junction-item.selected {
+    background: rgba(0,229,255,0.1);
+    border-color: var(--accent);
+  }
+
+  .jn-code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 2px;
+  }
+
+  .jn-name {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .jn-meta {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  /* ── Map ── */
+  #map {
+    flex: 1;
+    background: var(--bg);
+  }
+
+  /* ── Info Panel (bottom right) ── */
+  .info-panel {
+    position: absolute;
+    bottom: 24px;
+    right: 24px;
+    width: 320px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    z-index: 1000;
+    overflow: hidden;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+
+  .info-panel.visible {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .info-header {
+    padding: 14px 16px;
+    background: rgba(0,229,255,0.08);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .info-code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+
+  .info-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    margin-top: 2px;
+    line-height: 1.2;
+  }
+
+  .info-district {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 2px;
+    line-height: 1;
+  }
+
+  .close-btn:hover { color: var(--text); }
+
+  .info-body { padding: 14px 16px; }
+
+  .signal-hours {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 8px;
+  }
+
+  .hour-badge {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
+  }
+
+  .hour-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .hour-value {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--green);
+    margin-top: 2px;
+  }
+
+  .plans-title {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    font-family: var(--font-mono);
+  }
+
+  .plan-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    background: var(--bg);
+    border-radius: 5px;
+    margin-bottom: 4px;
+    border-left: 3px solid var(--accent2);
+  }
+
+  .plan-time {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text);
+    min-width: 100px;
+  }
+
+  .plan-cycle {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--yellow);
+    margin-left: auto;
+  }
+
+  .plan-phases {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  /* Leaflet popup override */
+  .leaflet-popup-content-wrapper {
+    background: var(--panel) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    color: var(--text) !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+  }
+  .leaflet-popup-tip { background: var(--panel) !important; }
+  .leaflet-popup-content { margin: 12px 14px !important; }
+
+  /* Custom marker */
+  .signal-marker {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  .signal-marker:hover { transform: scale(1.3); }
+
+  /* No results */
+  .no-results {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🚦</div>
+    <div>
+      <div class="logo-text">SIGNAL<span style="color:var(--accent2)">X</span></div>
+      <div class="logo-sub">Delhi Signal Intelligence</div>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="stat">
+      <div class="stat-num" id="stat-total">218</div>
+      <div class="stat-label">Junctions</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="stat-visible">218</div>
+      <div class="stat-label">Visible</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="stat-plans">879</div>
+      <div class="stat-label">Time Plans</div>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+  <div class="sidebar">
+
+    <!-- Search -->
+    <div class="sidebar-section">
+      <div class="section-title">Search</div>
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Junction name or code...">
+      </div>
+    </div>
+
+    <!-- District Filter -->
+    <div class="sidebar-section">
+      <div class="section-title">Filter by District</div>
+      <div class="filter-grid" id="filter-grid"></div>
+    </div>
+
+    <!-- Junction List -->
+    <div class="sidebar-section" style="padding-bottom:6px;">
+      <div class="section-title">Junctions <span id="list-count" style="color:var(--accent)"></span></div>
+    </div>
+    <div class="junction-list" id="junction-list"></div>
+
+  </div>
+
+  <div style="position:relative; flex:1;">
+    <div id="map"></div>
+    <div class="info-panel" id="info-panel">
+      <div class="info-header">
+        <div>
+          <div class="info-code" id="info-code"></div>
+          <div class="info-name" id="info-name"></div>
+          <div class="info-district" id="info-district"></div>
+        </div>
+        <button class="close-btn" onclick="closeInfo()">✕</button>
+      </div>
+      <div class="info-body">
+        <div class="signal-hours">
+          <div class="hour-badge">
+            <div class="hour-label">Signal On</div>
+            <div class="hour-value" id="info-signal"></div>
+          </div>
+          <div class="hour-badge">
+            <div class="hour-label">Blinker</div>
+            <div class="hour-value" id="info-blinker" style="color:var(--yellow)"></div>
+          </div>
+          <div class="hour-badge">
+            <div class="hour-label">Amber</div>
+            <div class="hour-value" id="info-amber" style="color:var(--accent2)"></div>
+          </div>
+        </div>
+        <div class="plans-title">Time Plans</div>
+        <div id="info-plans"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── District colors ──────────────────────────────────────────────
+const DISTRICT_COLORS = {
+  "Central":     "#00e5ff",
+  "South":       "#00ff88",
+  "South West":  "#69ff47",
+  "North":       "#ff6b35",
+  "North West":  "#ff9500",
+  "North East":  "#ff3d71",
+  "East":        "#c951ff",
+  "West":        "#ffdd00",
+  "New Delhi":   "#00b0ff",
+  "Shahdara":    "#ff4081",
+  "Outer":       "#a0a0a0",
+};
+
+function getColor(district) {
+  for (const key of Object.keys(DISTRICT_COLORS)) {
+    if ((district || "").includes(key)) return DISTRICT_COLORS[key];
+  }
+  return "#888";
+}
+
+// ── Init Map ─────────────────────────────────────────────────────
+const map = L.map('map', {
+  center: [28.6139, 77.2090],
+  zoom: 11,
+  zoomControl: false,
+});
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '© OpenStreetMap © CARTO',
+  maxZoom: 19
+}).addTo(map);
+
+L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
+// ── Load Data ────────────────────────────────────────────────────
+let allJunctions = [];
+let markers = [];
+let selectedItem = null;
+let activeDistrict = null;
+
+fetch('junctions_geocoded.json')
+  .then(r => r.json())
+  .then(data => {
+    allJunctions = data.filter(j => j.lat && j.lng);
+    document.getElementById('stat-total').textContent = allJunctions.length;
+    document.getElementById('stat-visible').textContent = allJunctions.length;
+
+    const totalPlans = allJunctions.reduce((s, j) => s + (j.plans||[]).length, 0);
+    document.getElementById('stat-plans').textContent = totalPlans;
+
+    buildFilters();
+    renderAll(allJunctions);
+  })
+  .catch(e => {
+    console.error(e);
+    alert('Could not load junctions_geocoded.json — make sure it is in the same folder as this HTML file and you are running a local server.\n\nRun: python -m http.server 8000\nThen open: http://localhost:8000');
+  });
+
+// ── Build district filters ───────────────────────────────────────
+function buildFilters() {
+  const districts = [...new Set(allJunctions.map(j => j.district).filter(Boolean))].sort();
+  const grid = document.getElementById('filter-grid');
+  grid.innerHTML = '';
+
+  // All button
+  const allBtn = document.createElement('button');
+  allBtn.className = 'filter-btn active';
+  allBtn.innerHTML = `<span class="filter-dot" style="background:#888"></span> All`;
+  allBtn.dataset.district = '';
+  allBtn.addEventListener('click', () => filterByDistrict('', allBtn));
+  grid.appendChild(allBtn);
+
+  districts.forEach(d => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.innerHTML = `<span class="filter-dot" style="background:${getColor(d)}"></span> ${d}`;
+    btn.dataset.district = d;
+    btn.addEventListener('click', () => filterByDistrict(d, btn));
+    grid.appendChild(btn);
+  });
+}
+
+function filterByDistrict(district, btn) {
+  activeDistrict = district || null;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+// ── Search ───────────────────────────────────────────────────────
+document.getElementById('search-input').addEventListener('input', applyFilters);
+
+function applyFilters() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  let filtered = allJunctions;
+
+  if (activeDistrict) {
+    filtered = filtered.filter(j => (j.district || '').includes(activeDistrict));
+  }
+  if (q) {
+    filtered = filtered.filter(j =>
+      (j.junction_name || '').toLowerCase().includes(q) ||
+      (j.junction_code || '').toLowerCase().includes(q)
+    );
+  }
+
+  document.getElementById('stat-visible').textContent = filtered.length;
+  renderAll(filtered);
+}
+
+// ── Render markers + list ────────────────────────────────────────
+function renderAll(junctions) {
+  // Clear old markers
+  markers.forEach(m => map.removeLayer(m));
+  markers = [];
+
+  // Build list
+  const list = document.getElementById('junction-list');
+  list.innerHTML = '';
+  document.getElementById('list-count').textContent = `(${junctions.length})`;
+
+  if (junctions.length === 0) {
+    list.innerHTML = '<div class="no-results">No junctions found</div>';
+    return;
+  }
+
+  junctions.forEach(jn => {
+    const color = getColor(jn.district);
+
+    // Marker
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="signal-marker" style="background:${color}22;border-color:${color};color:${color}">${(jn.junction_code||'').split('-')[1]||'•'}</div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14],
+    });
+
+    const marker = L.marker([jn.lat, jn.lng], { icon }).addTo(map);
+    marker.on('click', () => showInfo(jn));
+    markers.push(marker);
+
+    // List item
+    const item = document.createElement('div');
+    item.className = 'junction-item';
+    item.dataset.code = jn.junction_code;
+    item.innerHTML = `
+      <div class="jn-code" style="color:${color}">${jn.junction_code || 'N/A'}</div>
+      <div class="jn-name">${jn.junction_name || 'Unknown'}</div>
+      <div class="jn-meta">${jn.district || ''} · ${(jn.plans||[]).length} plans</div>
+    `;
+    item.addEventListener('click', () => {
+      map.setView([jn.lat, jn.lng], 15, { animate: true });
+      showInfo(jn);
+    });
+    list.appendChild(item);
+  });
+}
+
+// ── Show info panel ──────────────────────────────────────────────
+function showInfo(jn) {
+  document.getElementById('info-code').textContent = jn.junction_code || '';
+  document.getElementById('info-name').textContent = jn.junction_name || 'Unknown';
+  document.getElementById('info-district').textContent = `${jn.district || ''} · ${jn.circle || ''}`;
+  document.getElementById('info-signal').textContent = `${jn.signal_start||'?'} – ${jn.signal_end||'?'}`;
+  document.getElementById('info-blinker').textContent = `${jn.blinker_start||'?'} – ${jn.blinker_end||'?'}`;
+  document.getElementById('info-amber').textContent = `${jn.amber_sec||4}s`;
+
+  const plansDiv = document.getElementById('info-plans');
+  plansDiv.innerHTML = '';
+  (jn.plans || []).forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'plan-row';
+    div.innerHTML = `
+      <div>
+        <div class="plan-time">${p.time_slot || ''}</div>
+        <div class="plan-phases">${(p.phases||[]).join('s + ')}s</div>
+      </div>
+      <div class="plan-cycle">${p.total_cycle_sec}s</div>
+    `;
+    plansDiv.appendChild(div);
+  });
+
+  // Highlight list item
+  document.querySelectorAll('.junction-item').forEach(el => {
+    el.classList.toggle('selected', el.dataset.code === jn.junction_code);
+  });
+
+  document.getElementById('info-panel').classList.add('visible');
+}
+
+function closeInfo() {
+  document.getElementById('info-panel').classList.remove('visible');
+  document.querySelectorAll('.junction-item').forEach(el => el.classList.remove('selected'));
+}
+</script>
+</body>
+</html>
