@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SignalX — Rohtak Road Live Dashboard</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #eee; display: flex; height: 100vh; }
+
+    /* ── Sidebar ── */
+    #sidebar {
+      width: 340px; min-width: 340px;
+      background: #1a1d27;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    #sidebar-header {
+      background: #12151f;
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid #2a2d3a;
+    }
+    #sidebar-header h1 { font-size: 22px; color: #fff; letter-spacing: 1px; }
+    #sidebar-header p  { font-size: 12px; color: #888; margin-top: 3px; }
+    #clock { font-size: 13px; color: #4fc3f7; margin-top: 6px; font-weight: 600; }
+
+    #junction-list {
+      flex: 1; overflow-y: auto; padding: 10px 0;
+    }
+    #junction-list::-webkit-scrollbar { width: 5px; }
+    #junction-list::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+
+    .junction-card {
+      margin: 6px 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #20232f;
+      border-left: 4px solid #444;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .junction-card:hover { background: #272a38; }
+    .junction-card.green  { border-left-color: #4caf50; }
+    .junction-card.red    { border-left-color: #f44336; }
+    .junction-card.yellow { border-left-color: #ffb300; }
+
+    .card-top { display: flex; justify-content: space-between; align-items: center; }
+    .card-code { font-size: 11px; color: #888; font-weight: 600; }
+    .card-name { font-size: 13px; font-weight: 600; color: #fff; margin-top: 2px; }
+    .card-advice { font-size: 12px; margin-top: 6px; }
+    .card-meta { font-size: 11px; color: #666; margin-top: 4px; }
+
+    .phase-bar-wrap { margin-top: 8px; background: #333; border-radius: 4px; height: 5px; overflow: hidden; }
+    .phase-bar { height: 100%; border-radius: 4px; transition: width 1s linear; }
+
+    /* ── Map ── */
+    #map { flex: 1; }
+
+    /* ── Legend ── */
+    #legend {
+      position: absolute; bottom: 20px; right: 20px; z-index: 1000;
+      background: rgba(26,29,39,0.92); padding: 12px 16px; border-radius: 10px;
+      font-size: 12px; line-height: 2;
+    }
+    #legend div { display: flex; align-items: center; gap: 8px; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+
+    /* ── Refresh button ── */
+    #refresh-btn {
+      margin: 10px 12px;
+      padding: 10px;
+      background: #1e88e5;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    #refresh-btn:hover { background: #1565c0; }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div id="sidebar">
+  <div id="sidebar-header">
+    <h1>⚡ SignalX</h1>
+    <p>Rohtak Road Corridor · Live Signal Intelligence</p>
+    <div id="clock">Loading...</div>
+  </div>
+  <div id="junction-list"></div>
+  <button id="refresh-btn" onclick="refresh()">🔄 Refresh Signal Status</button>
+</div>
+
+<!-- Map -->
+<div id="map"></div>
+
+<!-- Legend -->
+<div id="legend">
+  <div><span class="dot" style="background:#4caf50"></span> Catch green — adjust speed</div>
+  <div><span class="dot" style="background:#f44336"></span> Stop / too fast</div>
+  <div><span class="dot" style="background:#ffb300"></span> Marginal / blinker</div>
+</div>
+
+<script>
+// ── Map setup ──────────────────────────────────────────────────────
+const map = L.map('map').setView([28.65, 77.12], 12);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '© OpenStreetMap contributors',
+  maxZoom: 19
+}).addTo(map);
+
+// Fallback tile if above fails
+const fallback = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors', maxZoom: 19
+});
+
+const markers = {};
+let junctionData = [];
+
+// ── Signal engine (JS port of signal_engine.py) ───────────────────
+function getActivePlan(junction) {
+  const now   = new Date();
+  const curMin = now.getHours() * 60 + now.getMinutes();
+
+  for (const plan of (junction.plans || [])) {
+    const [sh, sm] = plan.slot_start.replace(/\s/g,'').split(':').map(Number);
+    const [eh, em] = plan.slot_end.replace(/\s/g,'').split(':').map(Number);
+    const startMin = sh * 60 + sm;
+    const endMin   = eh * 60 + em;
+
+    if (startMin <= endMin) {
+      if (curMin >= startMin && curMin < endMin) return plan;
+    } else {
+      if (curMin >= startMin || curMin < endMin) return plan;
+    }
+  }
+  return null;
+}
+
+function getCyclePosition(cycleSec) {
+  return Math.floor(Date.now() / 1000) % cycleSec;
+}
+
+function getPhaseInfo(phases, pos) {
+  let elapsed = 0;
+  for (let i = 0; i < phases.length; i++) {
+    if (elapsed + phases[i] > pos) {
+      return {
+        phaseNum: i + 1,
+        total: phases.length,
+        remaining: (elapsed + phases[i]) - pos,
+        duration: phases[i],
+        pctDone: ((pos - elapsed) / phases[i]) * 100
+      };
+    }
+    elapsed += phases[i];
+  }
+  return null;
+}
+
+function recommendSpeed(distM, remaining) {
+  if (remaining < 5)  return { text: '🔴 Stop — light changing', color: 'red' };
+  const kmph = (distM / remaining) * 3.6;
+  if (kmph > 70)      return { text: '🔴 Too fast — wait for next green', color: 'red' };
+  if (kmph < 10)      return { text: '🔴 Too slow — prepare to stop', color: 'red' };
+  if (kmph >= 20 && kmph <= 60)
+                      return { text: `🟢 Drive at ${Math.round(kmph)} km/h`, color: 'green' };
+  return              { text: `🟡 Drive at ${Math.round(kmph)} km/h (marginal)`, color: 'yellow' };
+}
+
+// Demo distances (meters) — replace with GPS calc in real app
+const DEMO_DISTANCES = {
+  'E-2':300,'E-9':600,'E-10':400,'E-11':500,'K-3':350,
+  'E-16':700,'E-19':450,'E-20':300,'E-21':550,'E-22':400,
+  'E-23':600,'E-24':500,'E-25':350,'E-26':450,'E-27':300,
+  'E-28':600,'E-32':500,'E-3':400
+};
+
+const ROHTAK = ['E-2','E-3','E-9','E-10','E-11','K-3','E-16','E-19',
+                'E-20','E-21','E-22','E-23','E-24','E-25','E-26',
+                'E-27','E-28','E-32'];
+
+// ── Render ─────────────────────────────────────────────────────────
+function getStatusForJunction(j) {
+  const plan = getActivePlan(j);
+  if (!plan) return { advice: { text: '🟡 Blinker mode', color: 'yellow' }, plan: null, info: null };
+
+  const pos  = getCyclePosition(plan.total_cycle_sec);
+  const info = getPhaseInfo(plan.phases, pos);
+  if (!info) return { advice: { text: '⚠️ Unknown', color: 'yellow' }, plan, info: null };
+
+  const dist   = DEMO_DISTANCES[j.junction_code] || 500;
+  const advice = recommendSpeed(dist, info.remaining);
+  return { advice, plan, info, dist };
+}
+
+function colorToHex(c) {
+  return c === 'green' ? '#4caf50' : c === 'red' ? '#f44336' : '#ffb300';
+}
+
+function makeIcon(color) {
+  const hex = colorToHex(color);
+  return L.divIcon({
+    className: '',
+    html: `<div style="
+      width:14px;height:14px;border-radius:50%;
+      background:${hex};border:2px solid #fff;
+      box-shadow:0 0 6px ${hex};"></div>`,
+    iconSize: [14, 14],
+    iconAnchor: [7, 7]
+  });
+}
+
+function refresh() {
+  const list = document.getElementById('junction-list');
+  list.innerHTML = '';
+
+  const rohtak = junctionData.filter(j => ROHTAK.includes(j.junction_code));
+
+  rohtak.forEach(j => {
+    const { advice, plan, info, dist } = getStatusForJunction(j);
+    const code = j.junction_code || 'N/A';
+    const name = j.junction_name || 'Unknown';
+
+    // ── Sidebar card ──
+    const card = document.createElement('div');
+    card.className = `junction-card ${advice.color}`;
+    card.innerHTML = `
+      <div class="card-top">
+        <span class="card-code">${code}</span>
+        <span style="font-size:11px;color:#666">${dist || '?'}m away</span>
+      </div>
+      <div class="card-name">${name}</div>
+      <div class="card-advice">${advice.text}</div>
+      ${plan ? `
+        <div class="card-meta">
+          Cycle ${plan.total_cycle_sec}s · Phase ${info?.phaseNum}/${info?.total} · ${info?.remaining}s left
+        </div>
+        <div class="phase-bar-wrap">
+          <div class="phase-bar" style="
+            width:${info?.pctDone || 0}%;
+            background:${colorToHex(advice.color)}">
+          </div>
+        </div>` : ''}
+    `;
+    card.onclick = () => {
+      if (j.lat && j.lng) map.setView([j.lat, j.lng], 16);
+    };
+    list.appendChild(card);
+
+    // ── Map marker ──
+    if (j.lat && j.lng) {
+      if (markers[code]) {
+        markers[code].setIcon(makeIcon(advice.color));
+        markers[code].setPopupContent(popupHTML(j, advice, plan, info, dist));
+      } else {
+        const m = L.marker([j.lat, j.lng], { icon: makeIcon(advice.color) })
+          .addTo(map)
+          .bindPopup(popupHTML(j, advice, plan, info, dist));
+        markers[code] = m;
+      }
+    }
+  });
+}
+
+function popupHTML(j, advice, plan, info, dist) {
+  return `
+    <div style="font-family:Segoe UI;min-width:200px">
+      <b style="font-size:14px">${j.junction_code} — ${j.junction_name}</b><br>
+      <span style="color:${colorToHex(advice.color)};font-weight:600">${advice.text}</span><br><br>
+      ${plan ? `
+        <b>Active slot:</b> ${plan.slot_start} – ${plan.slot_end}<br>
+        <b>Cycle:</b> ${plan.total_cycle_sec}s &nbsp;|&nbsp;
+        <b>Phases:</b> [${plan.phases.join(', ')}]<br>
+        <b>Phase:</b> ${info?.phaseNum} of ${info?.total} &nbsp;|&nbsp;
+        <b>Remaining:</b> ${info?.remaining}s<br>
+        <b>Distance:</b> ${dist}m
+      ` : 'Blinker mode (signal off)'}
+    </div>`;
+}
+
+// ── Clock ──────────────────────────────────────────────────────────
+function updateClock() {
+  document.getElementById('clock').textContent =
+    '🕐 ' + new Date().toLocaleTimeString('en-IN', { hour12: false });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── Auto-refresh every 30 seconds ─────────────────────────────────
+setInterval(refresh, 30000);
+
+// ── Load data & init ───────────────────────────────────────────────
+fetch('junctions_geocoded.json')
+  .then(r => r.json())
+  .then(data => {
+    junctionData = data;
+    refresh();
+  })
+  .catch(e => {
+    document.getElementById('junction-list').innerHTML =
+      '<p style="color:#f44;padding:20px">❌ Could not load junctions_geocoded.json<br>Make sure server is running from D:\\Desktop\\signalX</p>';
+  });
+</script>
+</body>
+</html>
