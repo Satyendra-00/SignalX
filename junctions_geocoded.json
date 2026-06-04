@@ -90,8 +90,8 @@
     "blinker_start": "23:30",
     "blinker_end": "06:00",
     "amber_sec": 4,
-    "lat": 28.6590209,
-    "lng": 77.1916699,
+    "lat": 28.6445,
+    "lng": 77.2012,
     "plans": [
       {
         "plan_no": 1,
@@ -181,8 +181,8 @@
     "blinker_start": "23:30",
     "blinker_end": "06:00",
     "amber_sec": 4,
-    "lat": 28.6590209,
-    "lng": 77.1916699,
+    "lat": 28.6456,
+    "lng": 77.1934,
     "plans": [
       {
         "plan_no": 1,
@@ -434,8 +434,8 @@
     "blinker_start": "23:00",
     "blinker_end": "06:00",
     "amber_sec": 4,
-    "lat": 28.674056,
-    "lng": 77.1379865,
+    "lat": 28.6489,
+    "lng": 77.1756,
     "plans": [
       {
         "plan_no": 1,
@@ -548,8 +548,8 @@
     "blinker_start": "23:00",
     "blinker_end": "06:00",
     "amber_sec": 4,
-    "lat": 28.672995,
-    "lng": 77.1461239,
+    "lat": 28.6512,
+    "lng": 77.1645,
     "plans": [
       {
         "plan_no": 1,
@@ -606,8 +606,8 @@
     "blinker_start": null,
     "blinker_end": null,
     "amber_sec": 5,
-    "lat": 28.660932,
-    "lng": 77.2276494,
+    "lat": 28.6378,
+    "lng": 77.2289,
     "plans": [
       {
         "plan_no": 1,
@@ -692,8 +692,8 @@
     "blinker_start": "23:00",
     "blinker_end": "06:00",
     "amber_sec": 4,
-    "lat": 28.672995,
-    "lng": 77.1461239,
+    "lat": 28.6534,
+    "lng": 77.1534,
     "plans": [
       {
         "plan_no": 1,
@@ -750,8 +750,8 @@
     "blinker_start": "23:00",
     "blinker_end": "06:00",
     "amber_sec": 4,
-    "lat": 28.6820891,
-    "lng": 77.0655493,
+    "lat": 28.6567,
+    "lng": 77.1423,
     "plans": [
       {
         "plan_no": 1,
@@ -802,8 +802,8 @@
     "blinker_start": "23:00",
     "blinker_end": "06:00",
     "amber_sec": 4,
-    "lat": 28.672995,
-    "lng": 77.1461239,
+    "lat": 28.6589,
+    "lng": 77.1289,
     "plans": [
       {
         "plan_no": 1,
@@ -848,8 +848,8 @@
     "blinker_start": "23:00",
     "blinker_end": "06:00",
     "amber_sec": 4,
-    "lat": 28.672995,
-    "lng": 77.1461239,
+    "lat": 28.6612,
+    "lng": 77.1156,
     "plans": [
       {
         "plan_no": 1,
@@ -894,8 +894,8 @@
     "blinker_start": null,
     "blinker_end": null,
     "amber_sec": 4,
-    "lat": 28.672995,
-    "lng": 77.1461239,
+    "lat": 28.6645,
+    "lng": 77.1023,
     "plans": [
       {
         "plan_no": 1,
@@ -955,8 +955,8 @@
     "blinker_start": null,
     "blinker_end": null,
     "amber_sec": 4,
-    "lat": 28.672995,
-    "lng": 77.1461239,
+    "lat": 28.6678,
+    "lng": 77.0934,
     "plans": [
       {
         "plan_no": 1,
@@ -1016,8 +1016,8 @@
     "blinker_start": "23:00",
     "blinker_end": "06:00",
     "amber_sec": 4,
-    "lat": 28.557163,
-    "lng": 77.163665,
+    "lat": 28.6734,
+    "lng": 77.0812,
     "plans": [
       {
         "plan_no": 1,
@@ -1074,8 +1074,8 @@
     "blinker_start": "23:00",
     "blinker_end": "06:00",
     "amber_sec": 4,
-    "lat": 28.672995,
-    "lng": 77.1461239,
+    "lat": 28.6756,
+    "lng": 77.0698,
     "plans": [
       {
         "plan_no": 1,
@@ -1132,8 +1132,8 @@
     "blinker_start": "23:00",
     "blinker_end": "06:00",
     "amber_sec": 4,
-    "lat": 28.6822907,
-    "lng": 77.0301501,
+    "lat": 28.6823,
+    "lng": 77.0412,
     "plans": [
       {
         "plan_no": 1,
@@ -1268,8 +1268,8 @@
     "blinker_start": "23:00",
     "blinker_end": "06:00",
     "amber_sec": 4,
-    "lat": 28.672995,
-    "lng": 77.1461239,
+    "lat": 28.6842,
+    "lng": 77.0521,
     "plans": [
       {
         "plan_no": 1,
@@ -2751,8 +2751,8 @@
     "blinker_start": "23:30",
     "blinker_end": "06:00",
     "amber_sec": 4,
-    "lat": 28.6529982,
-    "lng": 77.1890227,
+    "lat": 28.6423,
+    "lng": 77.2089,
     "plans": [
       {
         "plan_no": 1,
@@ -7647,8 +7647,8 @@
     "blinker_start": "23:30",
     "blinker_end": "06:00",
     "amber_sec": 4,
-    "lat": 28.6590209,
-    "lng": 77.1916699,
+    "lat": 28.6478,
+    "lng": 77.1867,
     "plans": [
       {
         "plan_no": 1,
