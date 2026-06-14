@@ -1,463 +1,675 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>SignalX — Live Navigation</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', sans-serif; background: #1a0800; color: #eee; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SignalX — Rohtak Road Live Dashboard</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
 
-    /* ── Topbar ── */
-    #topbar {
-      background: linear-gradient(135deg, rgba(180,40,0,0.95), rgba(255,80,0,0.7));
-      backdrop-filter: blur(10px);
-      padding: 10px 20px;
-      display: flex; align-items: center; justify-content: space-between;
-      border-bottom: 1px solid rgba(255,120,30,0.3);
-      z-index: 1000; flex-shrink: 0;
-    }
-    #topbar h1 { font-size: 20px; color: #fff; letter-spacing: 2px; }
-    #clock { font-size: 13px; color: #ffcc88; font-weight: 600; }
-    #gps-status { font-size: 12px; padding: 4px 12px; border-radius: 20px; font-weight: 600; }
-    #gps-status.searching { background: rgba(255,180,0,0.15); color: #ffcc00; border: 1px solid #ffcc00; }
-    #gps-status.active    { background: rgba(0,200,100,0.15); color: #00e676; border: 1px solid #00e676; }
-    #gps-status.error     { background: rgba(255,50,50,0.15); color: #ff5252; border: 1px solid #ff5252; }
+body {
+  font-family: 'Rajdhani', sans-serif;
+  background: #050d1f;
+  color: #e0eaff;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
 
-    /* ── Search bar ── */
-    #search-bar {
-      background: rgba(25,6,0,0.97);
-      backdrop-filter: blur(12px);
-      padding: 10px 16px;
-      border-bottom: 1px solid rgba(255,100,30,0.2);
-      display: flex; gap: 10px; align-items: center;
-      flex-shrink: 0; position: relative; z-index: 500;
-    }
-    .search-wrap { position: relative; flex: 1; }
-    .search-wrap input {
-      width: 100%; padding: 9px 14px;
-      background: rgba(255,100,30,0.08);
-      border: 1px solid rgba(255,100,30,0.25);
-      border-radius: 8px; color: #fff; font-size: 13px; outline: none;
-    }
-    .search-wrap input::placeholder { color: rgba(255,160,80,0.4); }
-    .search-wrap input:focus { border-color: rgba(255,150,50,0.6); background: rgba(255,100,30,0.13); }
+/* ── TOP BAR ── */
+#topbar {
+  height: 48px;
+  background: #080f24;
+  border-bottom: 1px solid #1a2a5e;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 16px;
+  flex-shrink: 0;
+  z-index: 100;
+}
 
-    .suggestions-box {
-      position: absolute; top: calc(100% + 4px); left: 0;
-      width: 100%; max-height: 220px; overflow-y: auto;
-      background: rgba(28,7,0,0.98);
-      border: 1px solid rgba(255,100,30,0.3);
-      border-radius: 8px; z-index: 99999;
-      backdrop-filter: blur(14px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-    }
-    .suggestions-box::-webkit-scrollbar { width: 4px; }
-    .suggestions-box::-webkit-scrollbar-thumb { background: rgba(255,100,30,0.3); border-radius: 4px; }
-    .suggestion-item {
-      padding: 9px 14px; font-size: 12px; color: #ffddaa;
-      cursor: pointer; border-bottom: 1px solid rgba(255,100,30,0.08);
-    }
-    .suggestion-item:hover { background: rgba(255,100,30,0.18); color: #fff; }
-    .suggestion-item .s-code { color: #ff9944; font-weight: 700; margin-right: 6px; }
-    .suggestion-item .s-sub { font-size: 10px; color: rgba(255,160,80,0.4); margin-top: 2px; }
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
 
-    #use-gps-btn {
-      padding: 9px 14px; white-space: nowrap;
-      background: linear-gradient(135deg, rgba(200,60,0,0.7), rgba(255,120,30,0.4));
-      color: #ffddaa; border: 1px solid rgba(255,120,30,0.4);
-      border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600;
-      transition: background 0.2s;
-    }
-    #use-gps-btn:hover { background: linear-gradient(135deg, rgba(220,80,0,0.85), rgba(255,150,50,0.6)); }
+.logo-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 2px;
+}
 
-    /* ── Main layout ── */
-    #main { display: flex; flex: 1; overflow: hidden; }
+.logo-text span { color: #00c8ff; }
 
-    /* ── Sidebar ── */
-    #sidebar {
-      width: 320px; min-width: 320px;
-      background: rgba(18,4,0,0.9);
-      backdrop-filter: blur(16px);
-      border-right: 1px solid rgba(255,100,30,0.15);
-      display: flex; flex-direction: column; overflow: hidden;
-    }
+.logo-signal {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, #0066ff, #00c8ff);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 0 12px rgba(0,200,255,0.4);
+}
 
-    #next-junction {
-      background: linear-gradient(135deg, rgba(160,35,0,0.55), rgba(90,18,0,0.55));
-      border-bottom: 1px solid rgba(255,100,30,0.2);
-      padding: 14px 16px; flex-shrink: 0;
-    }
-    #next-junction h3 { font-size: 10px; color: rgba(255,160,80,0.55); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
-    #next-name   { font-size: 15px; font-weight: 700; color: #fff; }
-    #next-advice { font-size: 13px; margin-top: 5px; }
-    #next-distance { font-size: 12px; color: #ffcc88; margin-top: 3px; }
-    #next-detail { font-size: 10px; color: rgba(255,160,80,0.45); margin-top: 3px; }
+.topbar-divider {
+  width: 1px; height: 28px;
+  background: #1a2a5e;
+  flex-shrink: 0;
+}
 
-    #speed-display {
-      text-align: center; padding: 12px 8px;
-      border-bottom: 1px solid rgba(255,100,30,0.12);
-      flex-shrink: 0;
-    }
-    #speed-number { font-size: 46px; font-weight: 800; color: #ff6600; line-height: 1; letter-spacing: -1px; }
-    #speed-label  { font-size: 10px; color: rgba(255,160,80,0.45); margin-top: 3px; letter-spacing: 1px; }
+.corridor-info {
+  font-size: 12px;
+  color: #5a7ab5;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
 
-    #junction-list { flex: 1; overflow-y: auto; padding: 6px 0; }
-    #junction-list::-webkit-scrollbar { width: 4px; }
-    #junction-list::-webkit-scrollbar-thumb { background: rgba(255,100,30,0.25); border-radius: 4px; }
+.corridor-info span {
+  color: #00c8ff;
+  font-weight: 700;
+}
 
-    .junction-card {
-      margin: 5px 10px; border-radius: 10px;
-      background: rgba(35,8,0,0.6);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,100,30,0.08);
-      overflow: hidden; cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-    }
-    .junction-card:hover { background: rgba(75,18,0,0.65); transform: translateX(3px); }
-    .junction-card.is-next { border-color: rgba(255,200,50,0.45); box-shadow: 0 0 12px rgba(255,150,0,0.18); }
-    .top-strip { height: 3px; }
-    .junction-card.green  .top-strip { background: linear-gradient(90deg,#00e676,#69f0ae); }
-    .junction-card.red    .top-strip { background: linear-gradient(90deg,#ff1744,#ff6d00); }
-    .junction-card.yellow .top-strip { background: linear-gradient(90deg,#ffab00,#ffe57f); }
-    .card-body { padding: 8px 12px 10px; }
-    .card-top  { display: flex; justify-content: space-between; align-items: center; }
-    .card-code { font-size: 10px; color: #ff9944; font-weight: 700; letter-spacing: 0.5px; }
-    .card-name { font-size: 12px; font-weight: 600; color: #fff; margin-top: 2px; }
-    .card-advice { font-size: 11px; margin-top: 4px; }
-    .card-meta { font-size: 10px; color: rgba(255,160,80,0.38); margin-top: 3px; }
-    .phase-bar-wrap { margin-top: 6px; background: rgba(255,100,30,0.1); border-radius: 3px; height: 3px; overflow: hidden; }
-    .phase-bar { height: 100%; border-radius: 3px; }
-    .junction-card.green  .phase-bar { background: linear-gradient(90deg,#00e676,#69f0ae); }
-    .junction-card.red    .phase-bar { background: linear-gradient(90deg,#ff1744,#ff6d00); }
-    .junction-card.yellow .phase-bar { background: linear-gradient(90deg,#ffab00,#ffe57f); }
+#clock {
+  margin-left: auto;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 16px;
+  color: #00c8ff;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(0,200,255,0.5);
+}
 
-    /* ── Map ── */
-    #map { flex: 1; filter: sepia(0.5) saturate(0.8) brightness(0.7) hue-rotate(340deg); }
+/* ── MAIN LAYOUT ── */
+#main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
 
-    /* ── Legend ── */
-    #legend {
-      position: absolute; bottom: 20px; right: 20px; z-index: 1000;
-      background: rgba(18,4,0,0.92); backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,100,30,0.2);
-      padding: 10px 14px; border-radius: 10px;
-      font-size: 11px; line-height: 2.2; color: #ffccaa;
-    }
-    #legend div { display: flex; align-items: center; gap: 8px; }
-    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-  </style>
+/* ── LEFT PANEL ── */
+#left-panel {
+  width: 260px;
+  min-width: 260px;
+  background: #080f24;
+  border-right: 1px solid #1a2a5e;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 12px 14px 8px;
+  border-bottom: 1px solid #1a2a5e;
+  flex-shrink: 0;
+}
+
+.panel-title {
+  font-size: 11px;
+  color: #00c8ff;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.panel-sub {
+  font-size: 12px;
+  color: #5a7ab5;
+  margin-top: 2px;
+}
+
+#junction-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+
+#junction-list::-webkit-scrollbar { width: 3px; }
+#junction-list::-webkit-scrollbar-thumb { background: #1a2a5e; border-radius: 2px; }
+
+.jn-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-left: 3px solid transparent;
+}
+
+.jn-row:hover { background: rgba(0,100,255,0.08); }
+.jn-row.active {
+  background: rgba(0,200,255,0.08);
+  border-left-color: #00c8ff;
+}
+.jn-row.upcoming {
+  background: rgba(255,180,0,0.06);
+  border-left-color: #ffb400;
+}
+
+.jn-num {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: #5a7ab5;
+  min-width: 22px;
+}
+
+.jn-name {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 600;
+  color: #c0d4ff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jn-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+  min-width: 38px;
+  text-align: center;
+}
+
+.badge-go   { background: #00e676; color: #000; }
+.badge-slow { background: #ffb400; color: #000; }
+.badge-stop { background: #ff1744; color: #fff; }
+
+.jn-timer {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  min-width: 30px;
+  text-align: right;
+}
+
+.timer-go   { color: #00e676; }
+.timer-slow { color: #ffb400; }
+.timer-stop { color: #ff1744; }
+
+/* ── CENTER MAP ── */
+#map-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+#map { width: 100%; height: 100%; }
+
+/* MUNDKA / DELHI GATE labels */
+.corridor-label {
+  position: absolute;
+  z-index: 500;
+  background: rgba(100,0,255,0.85);
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+  box-shadow: 0 0 16px rgba(100,0,255,0.6);
+  pointer-events: none;
+}
+
+#label-mundka  { top: 20px; left: 50%; transform: translateX(-50%); }
+#label-dg      { bottom: 20px; left: 50%; transform: translateX(-50%); }
+
+/* ── RIGHT PANEL ── */
+#right-panel {
+  width: 220px;
+  min-width: 220px;
+  background: #080f24;
+  border-left: 1px solid #1a2a5e;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.stat-block {
+  padding: 18px 20px;
+  border-bottom: 1px solid #1a2a5e;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #5a7ab5;
+  font-family: 'Share Tech Mono', monospace;
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.stat-unit {
+  font-size: 13px;
+  color: #5a7ab5;
+  margin-top: 4px;
+}
+
+.stat-sub {
+  font-size: 11px;
+  margin-top: 4px;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+/* Speed sign */
+.speed-sign {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  border: 6px solid #ff1744;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+  background: #fff;
+  box-shadow: 0 0 20px rgba(255,23,68,0.4);
+}
+
+.speed-sign-num {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: #000;
+  line-height: 1;
+}
+
+.speed-sign-label {
+  font-size: 9px;
+  color: #333;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+/* Legend */
+#legend {
+  margin-top: auto;
+  padding: 14px 16px;
+  border-top: 1px solid #1a2a5e;
+}
+
+.legend-title {
+  font-size: 10px;
+  color: #5a7ab5;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+  font-size: 11px;
+  color: #8090b0;
+}
+
+.ldot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Leaflet overrides */
+.leaflet-popup-content-wrapper {
+  background: rgba(8,15,36,0.96) !important;
+  border: 1px solid #1a2a5e !important;
+  border-radius: 8px !important;
+  color: #c0d4ff !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
+}
+.leaflet-popup-tip { background: rgba(8,15,36,0.96) !important; }
+.leaflet-popup-content { margin: 10px 14px !important; font-family: 'Rajdhani', sans-serif !important; }
+</style>
 </head>
 <body>
 
-<!-- Topbar -->
+<!-- TOP BAR -->
 <div id="topbar">
-  <h1>⚡ SignalX</h1>
-  <div id="gps-status" class="searching">📡 Getting GPS...</div>
-  <div id="clock"></div>
+  <div class="logo">
+    <div class="logo-sign">🚦</div>
+    <div class="logo-text">Signal<span>X</span></div>
+  </div>
+  <div class="topbar-divider"></div>
+  <div class="corridor-info">
+    Rohtak Road Corridor &nbsp;·&nbsp;
+    <span>Mundka → Delhi Gate</span>
+    &nbsp;·&nbsp; 18 Junctions
+  </div>
+  <div id="clock">--:--:--</div>
 </div>
 
-<!-- Search bar -->
-<div id="search-bar">
-  <div class="search-wrap">
-    <input type="text" id="source-input" placeholder="📍 Your location (or use GPS)"
-      oninput="showSuggestions(this.value,'source-suggestions','source')"
-      onblur="setTimeout(()=>hideSuggestions('source-suggestions'),200)"
-      autocomplete="off">
-    <div class="suggestions-box" id="source-suggestions" style="display:none"></div>
-  </div>
-  <button id="use-gps-btn" onclick="startGPS()">📡 Use GPS</button>
-  <div class="search-wrap">
-    <input type="text" id="dest-input" placeholder="🏁 Destination"
-      oninput="showSuggestions(this.value,'dest-suggestions','dest')"
-      onblur="setTimeout(()=>hideSuggestions('dest-suggestions'),200)"
-      autocomplete="off">
-    <div class="suggestions-box" id="dest-suggestions" style="display:none"></div>
-  </div>
-</div>
-
-<!-- Main -->
+<!-- MAIN -->
 <div id="main">
-  <div id="sidebar">
-    <div id="next-junction">
-      <h3>⚡ Next Junction</h3>
-      <div id="next-name">Waiting for GPS...</div>
-      <div id="next-advice"></div>
-      <div id="next-distance"></div>
-      <div id="next-detail"></div>
-    </div>
-    <div id="speed-display">
-      <div id="speed-number">--</div>
-      <div id="speed-label">RECOMMENDED SPEED (km/h)</div>
+
+  <!-- LEFT -->
+  <div id="left-panel">
+    <div class="panel-header">
+      <div class="panel-title">⚡ Junction Status</div>
+      <div class="panel-sub">Live signal intelligence</div>
     </div>
     <div id="junction-list"></div>
   </div>
-  <div id="map"></div>
-</div>
 
-<!-- Legend -->
-<div id="legend">
-  <div><span class="dot" style="background:#00e676"></span> Catch green</div>
-  <div><span class="dot" style="background:#ff1744"></span> Stop / too fast</div>
-  <div><span class="dot" style="background:#ffab00"></span> Marginal</div>
-  <div><span class="dot" style="background:#fff"></span> Your location</div>
+  <!-- MAP -->
+  <div id="map-wrap">
+    <div id="map"></div>
+    <div class="corridor-label" id="label-mundka">MUNDKA</div>
+    <div class="corridor-label" id="label-dg">DELHI GATE</div>
+  </div>
+
+  <!-- RIGHT -->
+  <div id="right-panel">
+
+    <div class="stat-block">
+      <div class="stat-label">Your Speed</div>
+      <div class="stat-value" id="your-speed" style="font-size:52px;color:#00e676">--</div>
+      <div class="stat-unit">km/h</div>
+    </div>
+
+    <div class="stat-block">
+      <div class="stat-label">Next Signal</div>
+      <div class="stat-value" id="next-timer" style="font-size:44px;color:#00e676">--<span style="font-size:20px">s</span></div>
+      <div class="stat-sub" id="next-phase" style="color:#00e676">--</div>
+    </div>
+
+    <div class="stat-block">
+      <div class="stat-label">Distance</div>
+      <div class="stat-value" id="next-dist" style="font-size:36px;color:#c0d4ff">--</div>
+      <div class="stat-unit">to next junction</div>
+    </div>
+
+    <div class="stat-block" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-bottom:none">
+      <div class="stat-label" style="margin-bottom:12px">Recommended</div>
+      <div class="speed-sign">
+        <div class="speed-sign-num" id="rec-speed">--</div>
+        <div class="speed-sign-label">KM/H</div>
+      </div>
+    </div>
+
+    <div id="legend">
+      <div class="legend-title">Legend</div>
+      <div class="legend-row"><span class="ldot" style="background:#00e676"></span> GO — Catch green</div>
+      <div class="legend-row"><span class="ldot" style="background:#ffb400"></span> SLOW — Marginal</div>
+      <div class="legend-row"><span class="ldot" style="background:#ff1744"></span> STOP — Wait</div>
+      <div class="legend-row"><span class="ldot" style="background:#fff;border:2px solid #00c8ff"></span> Your location</div>
+    </div>
+
+  </div>
 </div>
 
 <script>
-// ── Map ────────────────────────────────────────────────────────────
-const map = L.map('map').setView([28.65, 77.15], 12);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', { opacity: 0.4, maxZoom: 19 }).addTo(map);
+// ── Map ─────────────────────────────────────────────────────────
+const map = L.map('map', { zoomControl: false }).setView([28.655, 77.145], 12);
+L.control.zoom({ position: 'topright' }).addTo(map);
 
-const markers  = {};
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+  attribution: '© OpenStreetMap © CARTO', maxZoom: 19
+}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
+  opacity: 0.4, maxZoom: 19
+}).addTo(map);
+
+// ── Data ────────────────────────────────────────────────────────
+const ROHTAK_ORDER = [
+  'E-28','E-32','E-27','E-26','E-25','E-24','E-23',
+  'E-22','E-21','E-20','E-19','E-16','K-3','E-11',
+  'E-10','E-9','E-3','E-2'
+];
+
+const DEMO_DIST = {
+  'E-28':300,'E-32':400,'E-27':350,'E-26':450,'E-25':350,
+  'E-24':500,'E-23':600,'E-22':400,'E-21':550,'E-20':300,
+  'E-19':450,'E-16':700,'K-3':350,'E-11':500,'E-10':400,
+  'E-9':600,'E-3':400,'E-2':300
+};
+
 let junctionData = [];
+let orderedJunctions = [];
+const jMarkers = {};
+let corridorLines = [];
+let userMarker = null;
+let simIndex = 0, simT = 0;
 let userLat = null, userLng = null;
-let destLat = null, destLng = null;
-let userMarker = null, destMarker = null;
-let watchId = null;
+let useRealGPS = false;
 
-// ── Signal Engine ──────────────────────────────────────────────────
-function getActivePlan(junction) {
-  const now    = new Date();
-  const curMin = now.getHours() * 60 + now.getMinutes();
-  for (const plan of (junction.plans || [])) {
-    const [sh, sm] = plan.slot_start.replace(/\s/g,'').split(':').map(Number);
-    const [eh, em] = plan.slot_end.replace(/\s/g,'').split(':').map(Number);
-    const s = sh*60+sm, e = eh*60+em;
-    if (s <= e) { if (curMin >= s && curMin < e) return plan; }
-    else        { if (curMin >= s || curMin < e) return plan; }
+// ── Signal engine ────────────────────────────────────────────────
+function getActivePlan(jn) {
+  const now = new Date();
+  const cur = now.getHours()*60 + now.getMinutes();
+  for (const p of (jn.plans||[])) {
+    if (!p.slot_start||!p.slot_end) continue;
+    const [sh,sm] = p.slot_start.replace(/\s/g,'').split(':').map(Number);
+    const [eh,em] = p.slot_end.replace(/\s/g,'').split(':').map(Number);
+    const s=sh*60+sm, e=eh*60+em;
+    if (s<=e){ if(cur>=s&&cur<e) return p; }
+    else     { if(cur>=s||cur<e) return p; }
   }
   return null;
 }
 
-function getCyclePos(cycleSec) { return Math.floor(Date.now()/1000) % cycleSec; }
+function getCyclePos(sec) { return Math.floor(Date.now()/1000)%sec; }
 
 function getPhaseInfo(phases, pos) {
-  let elapsed = 0;
-  for (let i = 0; i < phases.length; i++) {
-    if (elapsed + phases[i] > pos) return {
-      phaseNum: i+1, total: phases.length,
-      remaining: (elapsed+phases[i])-pos,
-      duration: phases[i],
-      pctDone: ((pos-elapsed)/phases[i])*100
+  let el=0;
+  for (let i=0;i<phases.length;i++) {
+    if (el+phases[i]>pos) return {
+      phaseNum:i+1, total:phases.length,
+      remaining:(el+phases[i])-pos,
+      pctDone:((pos-el)/phases[i])*100
     };
-    elapsed += phases[i];
+    el+=phases[i];
   }
   return null;
 }
 
-function recommendSpeed(distM, remaining) {
-  if (remaining < 5)            return { text:'🔴 Stop — light changing',         color:'red',    kmph:0 };
-  const kmph = (distM/remaining)*3.6;
-  if (kmph > 70)                return { text:'🔴 Too fast — wait for next green', color:'red',    kmph };
-  if (kmph < 10)                return { text:'🔴 Too slow — prepare to stop',     color:'red',    kmph };
-  if (kmph >= 20 && kmph <= 60) return { text:`🟢 Drive at ${Math.round(kmph)} km/h`, color:'green',  kmph };
-  return                               { text:`🟡 Drive at ${Math.round(kmph)} km/h`, color:'yellow', kmph };
+function getStatus(jn, distM) {
+  const plan = getActivePlan(jn);
+  if (!plan) return { badge:'SLOW', color:'#ffb400', remaining:null, recSpeed:null };
+  const pos  = getCyclePos(plan.total_cycle_sec);
+  const info = getPhaseInfo(plan.phases, pos);
+  if (!info) return { badge:'SLOW', color:'#ffb400', remaining:null, recSpeed:null };
+
+  const rem  = info.remaining;
+  const kmph = distM && rem > 3 ? (distM/rem)*3.6 : null;
+
+  let badge, color;
+  if (rem < 5)               { badge='STOP'; color='#ff1744'; }
+  else if (!kmph)            { badge='SLOW'; color='#ffb400'; }
+  else if (kmph>70||kmph<10) { badge='STOP'; color='#ff1744'; }
+  else if (kmph>=20&&kmph<=60){ badge='GO';  color='#00e676'; }
+  else                       { badge='SLOW'; color='#ffb400'; }
+
+  return { badge, color, remaining:rem, recSpeed: kmph ? Math.round(kmph) : null, plan, info };
 }
 
-// ── Haversine distance ─────────────────────────────────────────────
-function dist(lat1,lng1,lat2,lng2) {
-  const R=6371000, dL=(lat2-lat1)*Math.PI/180, dN=(lng2-lng1)*Math.PI/180;
-  const a=Math.sin(dL/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dN/2)**2;
-  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+function colorHex(badge) {
+  return badge==='GO' ? '#00e676' : badge==='STOP' ? '#ff1744' : '#ffb400';
 }
 
-// ── GPS ────────────────────────────────────────────────────────────
-function startGPS() {
-  const el = document.getElementById('gps-status');
-  el.className='searching'; el.textContent='📡 Getting GPS...';
-  if (!navigator.geolocation) { el.className='error'; el.textContent='❌ GPS not supported'; return; }
-  if (watchId) navigator.geolocation.clearWatch(watchId);
-  watchId = navigator.geolocation.watchPosition(pos => {
-    userLat = pos.coords.latitude;
-    userLng = pos.coords.longitude;
-    el.className='active';
-    el.textContent=`✅ GPS Active (±${Math.round(pos.coords.accuracy)}m)`;
-    document.getElementById('source-input').value = `${userLat.toFixed(5)}, ${userLng.toFixed(5)}`;
-    if (userMarker) userMarker.setLatLng([userLat,userLng]);
-    else {
-      userMarker = L.circleMarker([userLat,userLng],{
-        radius:10, color:'#fff', fillColor:'#fff', fillOpacity:0.9, weight:3
-      }).addTo(map).bindPopup('📍 Your Location');
-      map.setView([userLat,userLng],14);
-    }
-    refresh();
-  }, err => {
-    el.className='error'; el.textContent='❌ GPS denied';
-    console.error(err);
-  }, { enableHighAccuracy:true, timeout:15000, maximumAge:5000 });
-}
-
-// ── Suggestions ────────────────────────────────────────────────────
-function showSuggestions(query, boxId, type) {
-  const box = document.getElementById(boxId);
-  if (!query || query.length < 2) { box.style.display='none'; return; }
-  const q = query.toLowerCase();
-  const matches = junctionData.filter(j =>
-    (j.junction_name||'').toLowerCase().includes(q) ||
-    (j.junction_code||'').toLowerCase().includes(q) ||
-    (j.district||'').toLowerCase().includes(q) ||
-    (j.circle||'').toLowerCase().includes(q)
-  ).slice(0,8);
-  if (!matches.length) { box.style.display='none'; return; }
-  box.innerHTML = matches.map(j => `
-    <div class="suggestion-item" onmousedown="selectSuggestion('${j.junction_code}','${boxId}','${type}')">
-      <span class="s-code">${j.junction_code}</span>${j.junction_name||''}
-      <div class="s-sub">${j.district||''} ${j.circle?'· '+j.circle:''}</div>
-    </div>`).join('');
-  box.style.display='block';
-}
-
-function hideSuggestions(boxId) {
-  document.getElementById(boxId).style.display='none';
-}
-
-function selectSuggestion(code, boxId, type) {
-  const j = junctionData.find(j => j.junction_code===code);
-  if (!j) return;
-  const inputId = type==='source' ? 'source-input' : 'dest-input';
-  document.getElementById(inputId).value = `${j.junction_code} — ${j.junction_name}`;
-  hideSuggestions(boxId);
-
-  if (j.lat && j.lng) {
-    map.setView([j.lat,j.lng],15);
-    if (markers[j.junction_code]) markers[j.junction_code].openPopup();
-  }
-
-  if (type==='source') {
-    userLat=j.lat; userLng=j.lng;
-    if (userMarker) userMarker.setLatLng([userLat,userLng]);
-    else userMarker = L.circleMarker([userLat,userLng],{
-      radius:10,color:'#fff',fillColor:'#fff',fillOpacity:0.9,weight:3
-    }).addTo(map).bindPopup('📍 Your Location');
-    refresh();
-  } else {
-    destLat=j.lat; destLng=j.lng;
-    if (destMarker) destMarker.setLatLng([destLat,destLng]);
-    else destMarker = L.circleMarker([destLat,destLng],{
-      radius:10,color:'#ff6600',fillColor:'#ff6600',fillOpacity:0.9,weight:3
-    }).addTo(map).bindPopup('🏁 Destination');
-    refresh();
-  }
-}
-
-// ── Get nearby junctions sorted by distance ────────────────────────
-function getSortedJunctions() {
-  const all = junctionData.filter(j => j.lat && j.lng);
-  if (userLat===null) return all.slice(0,50);
-  return all
-    .map(j => ({...j, _dist: dist(userLat,userLng,j.lat,j.lng)}))
-    .filter(j => j._dist < 2000)
-    .sort((a,b) => a._dist - b._dist);
-}
-
-// ── Colors & icons ─────────────────────────────────────────────────
-function colorHex(c) { return c==='green'?'#00e676':c==='red'?'#ff1744':'#ffab00'; }
-
-function makeIcon(color, isNext) {
-  const hex=colorHex(color), sz=isNext?18:13;
+// ── Map helpers ──────────────────────────────────────────────────
+function makeJunctionIcon(badge, num) {
+  const hex = colorHex(badge);
   return L.divIcon({
-    className:'',
-    html:`<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:${hex};border:2px solid #fff;box-shadow:0 0 ${isNext?12:5}px ${hex}88"></div>`,
-    iconSize:[sz,sz], iconAnchor:[sz/2,sz/2]
+    className: '',
+    html: `<div style="
+      width:32px;height:32px;border-radius:50%;
+      background:${hex}22;border:2.5px solid ${hex};
+      color:${hex};font-size:10px;font-weight:700;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Share Tech Mono',monospace;
+      box-shadow:0 0 12px ${hex}88;
+    ">${num}</div>`,
+    iconSize:[32,32], iconAnchor:[16,16]
   });
 }
 
-// ── Render ─────────────────────────────────────────────────────────
-function refresh() {
-  const list   = document.getElementById('junction-list');
+function makeUserIcon() {
+  return L.divIcon({
+    className: '',
+    html: `<div style="position:relative;width:24px;height:24px">
+      <div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,200,255,0.15);animation:ripple 1.5s infinite"></div>
+      <div style="position:absolute;inset:4px;border-radius:50%;background:#fff;border:3px solid #00c8ff;box-shadow:0 0 16px rgba(0,200,255,0.8)"></div>
+    </div>
+    <style>@keyframes ripple{0%{transform:scale(1);opacity:0.6}100%{transform:scale(2.5);opacity:0}}</style>`,
+    iconSize:[24,24], iconAnchor:[12,12]
+  });
+}
+
+function drawCorridor(junctions) {
+  corridorLines.forEach(l => map.removeLayer(l));
+  corridorLines = [];
+  const coords = junctions.filter(j=>j.lat&&j.lng).map(j=>[j.lat,j.lng]);
+  if (coords.length<2) return;
+  corridorLines.push(L.polyline(coords,{color:'#00c8ff',weight:8,opacity:0.08}).addTo(map));
+  corridorLines.push(L.polyline(coords,{color:'#00c8ff',weight:4,opacity:0.25}).addTo(map));
+  corridorLines.push(L.polyline(coords,{color:'#00c8ff',weight:1.5,opacity:0.8,dashArray:'8,5'}).addTo(map));
+}
+
+// ── Render ───────────────────────────────────────────────────────
+function render() {
+  const list = document.getElementById('junction-list');
   list.innerHTML = '';
-  const sorted = getSortedJunctions();
 
-  if (sorted.length===0 && userLat!==null) {
-    document.getElementById('next-name').textContent     = '📍 No junctions within 2km';
-    document.getElementById('next-advice').textContent   = 'Drive closer to a signal junction';
-    document.getElementById('next-distance').textContent = '';
-    document.getElementById('next-detail').textContent   = '';
-    document.getElementById('speed-number').textContent  = '--';
-    return;
-  }
+  orderedJunctions.forEach((jn, idx) => {
+    const code = jn.junction_code||'';
+    const name = jn.junction_name||'Unknown';
+    const dist = DEMO_DIST[code]||500;
+    const { badge, color, remaining, recSpeed, plan, info } = getStatus(jn, dist);
 
-  const nextJ = sorted[0];
+    // ── List row ──
+    const row = document.createElement('div');
+    row.className = 'jn-row' + (idx===0?' upcoming':'');
+    row.dataset.code = code;
+    row.innerHTML = `
+      <span class="jn-num">${String(idx+1).padStart(2,'0')}</span>
+      <span class="jn-name">${name}</span>
+      <span class="jn-badge badge-${badge.toLowerCase()}">${badge}</span>
+      <span class="jn-timer timer-${badge.toLowerCase()}">${remaining!=null?remaining+'s':'--'}</span>
+    `;
+    row.onclick = () => { if(jn.lat&&jn.lng) map.setView([jn.lat,jn.lng],15,{animate:true}); };
+    list.appendChild(row);
 
-  // Next junction panel
-  if (nextJ && userLat!==null) {
-    const d    = Math.round(nextJ._dist || dist(userLat,userLng,nextJ.lat,nextJ.lng));
-    const plan = getActivePlan(nextJ);
-    if (plan) {
-      const info   = getPhaseInfo(plan.phases, getCyclePos(plan.total_cycle_sec));
-      const advice = info ? recommendSpeed(d, info.remaining) : {text:'⚠️ Unknown',color:'yellow',kmph:0};
-      document.getElementById('next-name').textContent     = `${nextJ.junction_code} — ${nextJ.junction_name}`;
-      document.getElementById('next-advice').textContent   = advice.text;
-      document.getElementById('next-distance').textContent = `📏 ${d}m away`;
-      document.getElementById('next-detail').textContent   = info ? `Phase ${info.phaseNum}/${info.total} · ${info.remaining}s left · Cycle ${plan.total_cycle_sec}s` : '';
-      const spd = advice.kmph>0 ? Math.round(advice.kmph) : '--';
-      document.getElementById('speed-number').textContent  = spd;
-      document.getElementById('speed-number').style.color  = colorHex(advice.color);
-    }
-  }
-
-  // Junction cards + markers
-  sorted.forEach((j, idx) => {
-    const isNext = idx===0 && userLat!==null;
-    const d      = userLat!==null ? Math.round(j._dist||dist(userLat,userLng,j.lat,j.lng)) : null;
-    const plan   = getActivePlan(j);
-    if (!plan) return;
-    const info   = getPhaseInfo(plan.phases, getCyclePos(plan.total_cycle_sec));
-    if (!info) return;
-    const advice = recommendSpeed(d||500, info.remaining);
-
-    // Card
-    const card = document.createElement('div');
-    card.className = `junction-card ${advice.color}${isNext?' is-next':''}`;
-    card.innerHTML = `
-      <div class="top-strip"></div>
-      <div class="card-body">
-        <div class="card-top">
-          <span class="card-code">${isNext?'⚡ NEXT · ':''}${j.junction_code}</span>
-          <span style="font-size:10px;color:rgba(255,160,80,0.4)">${d!==null?d+'m':''}</span>
-        </div>
-        <div class="card-name">${j.junction_name}</div>
-        <div class="card-advice">${advice.text}</div>
-        <div class="card-meta">Cycle ${plan.total_cycle_sec}s · Phase ${info.phaseNum}/${info.total} · ${info.remaining}s left</div>
-        <div class="phase-bar-wrap"><div class="phase-bar" style="width:${info.pctDone||0}%"></div></div>
-      </div>`;
-    card.onclick = () => { if (j.lat&&j.lng) map.setView([j.lat,j.lng],16); };
-    list.appendChild(card);
-
-    // Marker
-    if (j.lat && j.lng) {
-      if (markers[j.junction_code]) {
-        markers[j.junction_code].setIcon(makeIcon(advice.color,isNext));
-        markers[j.junction_code].setPopupContent(
-          `<b>${j.junction_code} — ${j.junction_name}</b><br>${advice.text}<br>Phase ${info.phaseNum}/${info.total} · ${info.remaining}s left`
-        );
+    // ── Map marker ──
+    if (jn.lat&&jn.lng) {
+      const num = code.split('-')[1]||'?';
+      if (jMarkers[code]) {
+        jMarkers[code].setIcon(makeJunctionIcon(badge, num));
+        jMarkers[code].setPopupContent(popupHTML(jn, badge, color, remaining, recSpeed, plan, info, dist));
       } else {
-        markers[j.junction_code] = L.marker([j.lat,j.lng],{icon:makeIcon(advice.color,isNext)})
+        jMarkers[code] = L.marker([jn.lat,jn.lng],{icon:makeJunctionIcon(badge,num)})
           .addTo(map)
-          .bindPopup(`<b>${j.junction_code} — ${j.junction_name}</b><br>${advice.text}`);
+          .bindPopup(popupHTML(jn,badge,color,remaining,recSpeed,plan,info,dist));
       }
     }
   });
+
+  // ── Update right panel from first junction ──
+  if (orderedJunctions.length > 0) {
+    const first = orderedJunctions[0];
+    const dist  = DEMO_DIST[first.junction_code]||500;
+    const st    = getStatus(first, dist);
+
+    document.getElementById('next-timer').innerHTML =
+      st.remaining!=null ? `${st.remaining}<span style="font-size:20px">s</span>` : '--';
+    document.getElementById('next-timer').style.color = st.color;
+
+    document.getElementById('next-phase').textContent =
+      st.badge==='GO' ? 'GREEN' : st.badge==='STOP' ? 'RED' : 'SLOW';
+    document.getElementById('next-phase').style.color = st.color;
+
+    document.getElementById('next-dist').textContent = dist+'m';
+    document.getElementById('rec-speed').textContent = st.recSpeed||'--';
+
+    // Simulate current speed
+    document.getElementById('your-speed').textContent = st.recSpeed ? st.recSpeed+2 : '--';
+  }
 }
 
-// ── Clock ──────────────────────────────────────────────────────────
-function updateClock() {
+function popupHTML(jn, badge, color, rem, rec, plan, info, dist) {
+  return `<div style="min-width:180px">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#00c8ff;margin-bottom:2px">${jn.junction_code}</div>
+    <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">${jn.junction_name}</div>
+    <div style="color:${color};font-weight:700;font-size:14px;margin-bottom:8px">
+      ${badge==='GO'?'🟢 GO':'badge'==='STOP'?'🔴 STOP':'🟡 SLOW'} &nbsp; ${rem!=null?rem+'s remaining':''}
+    </div>
+    ${plan?`<div style="font-size:11px;color:#8090b0;line-height:1.8">
+      Cycle: ${plan.total_cycle_sec}s &nbsp;|&nbsp; Phase: ${info?.phaseNum}/${info?.total}<br>
+      Distance: ${dist}m &nbsp;|&nbsp; Rec. speed: ${rec||'--'} km/h
+    </div>`:''}
+  </div>`;
+}
+
+// ── GPS / Simulation ─────────────────────────────────────────────
+function lerp(a,b,t){ return a+(b-a)*t; }
+
+function animateSim() {
+  if (useRealGPS || orderedJunctions.length<2) { requestAnimationFrame(animateSim); return; }
+  simT += 0.003;
+  if (simT>=1) { simT=0; simIndex=(simIndex+1)%(orderedJunctions.length-1); }
+  const from=orderedJunctions[simIndex], to=orderedJunctions[simIndex+1];
+  if (!from?.lat||!to?.lat){ requestAnimationFrame(animateSim); return; }
+  const lat=lerp(from.lat,to.lat,simT), lng=lerp(from.lng,to.lng,simT);
+  if (!userMarker) userMarker=L.marker([lat,lng],{icon:makeUserIcon(),zIndexOffset:1000}).addTo(map);
+  else userMarker.setLatLng([lat,lng]);
+  requestAnimationFrame(animateSim);
+}
+
+function startRealGPS() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.watchPosition(pos => {
+    useRealGPS = true;
+    userLat = pos.coords.latitude;
+    userLng = pos.coords.longitude;
+    if (!userMarker) userMarker=L.marker([userLat,userLng],{icon:makeUserIcon(),zIndexOffset:1000}).addTo(map);
+    else userMarker.setLatLng([userLat,userLng]);
+    map.setView([userLat,userLng],14,{animate:true});
+  }, err => { useRealGPS=false; }, { enableHighAccuracy:true, maximumAge:3000 });
+}
+
+// ── Clock ────────────────────────────────────────────────────────
+function tick() {
   document.getElementById('clock').textContent =
-    '🕐 ' + new Date().toLocaleTimeString('en-IN',{hour12:false});
+    new Date().toLocaleTimeString('en-IN',{hour12:false});
 }
-setInterval(updateClock,1000);
-updateClock();
+setInterval(tick,1000); tick();
 
-// Auto refresh every 10s
-setInterval(refresh,10000);
+// ── Auto refresh ─────────────────────────────────────────────────
+setInterval(render, 5000);
 
-// ── Load data ──────────────────────────────────────────────────────
+// ── Init ─────────────────────────────────────────────────────────
 fetch('junctions_geocoded.json')
-  .then(r => r.json())
-  .then(data => { junctionData=data; refresh(); startGPS(); })
-  .catch(() => {
-    document.getElementById('next-name').textContent='❌ Could not load junction data';
+  .then(r=>r.json())
+  .then(data => {
+    junctionData = data;
+    orderedJunctions = ROHTAK_ORDER
+      .map(code=>data.find(j=>j.junction_code===code))
+      .filter(Boolean);
+    drawCorridor(orderedJunctions);
+    render();
+    startRealGPS();
+    animateSim();
+  })
+  .catch(()=>{
+    document.getElementById('junction-list').innerHTML =
+      '<p style="color:#ff4444;padding:16px;font-size:13px">❌ Cannot load junctions_geocoded.json<br>Run: python -m http.server 8000</p>';
   });
 </script>
 </body>
