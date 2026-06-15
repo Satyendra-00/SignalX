@@ -1,6 +1,15 @@
 # SignalX 🚦
 ## Real-Time Signal-Aware Speed Guidance for Urban Drivers
 
+
+
+Live deployed project url : https://signall-x.vercel.app/
+
+
+
+
+
+
 SignalX is an urban mobility innovation that helps drivers reduce unnecessary stops at traffic signals by providing real-time, signal-aware speed guidance.
 
 Unlike traditional navigation apps that only tell drivers **where to go**, SignalX helps them understand **how to drive between junctions** to maximize the chances of catching green lights, reducing fuel consumption, travel time, emissions, and stop-and-go traffic.
