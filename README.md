@@ -6,6 +6,16 @@
 Live deployed project url : https://signall-x.vercel.app/
 
 
+1. enter source (mundka)
+2. enter destintion ( delhi)
+3. click on go button
+4. live demo/prootype visible 
+5. avoid location permission do not permmit 
+
+
+
+
+
 
 
 
