@@ -3,8 +3,7 @@
 
 
 
-Live deployed project url : https://signall-x.vercel.app/
-
+Live deployed project url : https://signalx-ai.vercel.app/dashboard.html
 
 1. enter source (mundka)
 2. enter destintion ( delhi)
