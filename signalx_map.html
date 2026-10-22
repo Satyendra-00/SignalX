@@ -253,6 +253,31 @@
     background: var(--bg);
   }
 
+  .map-stage {
+    position: relative;
+    flex: 1;
+    display: flex;
+    min-width: 0;
+  }
+
+  #map-tile-error {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1100;
+    max-width: calc(100% - 24px);
+    padding: 8px 12px;
+    border: 1px solid var(--yellow);
+    border-radius: 6px;
+    background: rgba(15, 22, 40, 0.96);
+    color: var(--yellow);
+    font-size: 12px;
+    text-align: center;
+  }
+
+  #map-tile-error[hidden] { display: none; }
+
   /* ── Info Panel (bottom right) ── */
   .info-panel {
     position: absolute;
@@ -478,8 +503,9 @@
 
   </div>
 
-  <div style="position:relative; flex:1;">
+  <div class="map-stage">
     <div id="map"></div>
+    <div id="map-tile-error" role="status" aria-live="polite" hidden>Map tiles couldn't be loaded. Check your internet connection and try again.</div>
     <div class="info-panel" id="info-panel">
       <div class="info-header">
         <div>
@@ -541,10 +567,15 @@ const map = L.map('map', {
   zoomControl: false,
 });
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution: '© OpenStreetMap © CARTO',
+const tileErrorNotice = document.getElementById('map-tile-error');
+const osmTiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
   maxZoom: 19
 }).addTo(map);
+let tileErrorsInCurrentLoad = 0;
+osmTiles.on('loading', () => { tileErrorsInCurrentLoad = 0; });
+osmTiles.on('tileerror', () => { tileErrorsInCurrentLoad += 1; });
+osmTiles.on('load', () => { tileErrorNotice.hidden = tileErrorsInCurrentLoad === 0; });
 
 L.control.zoom({ position: 'bottomleft' }).addTo(map);
 

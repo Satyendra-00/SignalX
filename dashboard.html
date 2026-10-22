@@ -64,6 +64,8 @@
     .jrow-bar-fill { height:100%; transition:width 1s linear; }
     #map-wrap { flex:1; position:relative; }
     #map { width:100%; height:100%; }
+    #map-tile-error { position:absolute; top:66px; left:50%; transform:translateX(-50%); z-index:450; max-width:calc(100% - 24px); padding:8px 12px; border:1px solid rgba(255,171,0,0.55); border-radius:6px; background:rgba(10,15,35,0.94); color:#ffcc80; font-size:12px; text-align:center; }
+    #map-tile-error[hidden] { display:none; }
     #stats-bar { position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:400; display:flex; gap:8px; align-items:center; }
     .stat-card { background:rgba(10,15,40,0.92); backdrop-filter:blur(12px); border:1px solid rgba(100,160,255,0.2); border-radius:10px; padding:8px 16px; text-align:center; min-width:90px; }
     .stat-card .slabel { font-size:9px; color:rgba(150,180,255,0.5); text-transform:uppercase; letter-spacing:1px; }
@@ -127,6 +129,7 @@
   </div>
   <div id="map-wrap">
     <div id="map"></div>
+    <div id="map-tile-error" role="status" aria-live="polite" hidden>Map tiles couldn't be loaded. Check your internet connection and try again.</div>
     <div id="stats-bar">
       <div class="stat-card">
         <div class="slabel">Your Speed</div>
@@ -169,8 +172,15 @@
 </div>
 <script>
 const map = L.map('map').setView([28.655,77.15],12);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png',{opacity:0.35,maxZoom:19}).addTo(map);
+const tileErrorNotice = document.getElementById('map-tile-error');
+const osmTiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+}).addTo(map);
+let tileErrorsInCurrentLoad = 0;
+osmTiles.on('loading', () => { tileErrorsInCurrentLoad = 0; });
+osmTiles.on('tileerror', () => { tileErrorsInCurrentLoad += 1; });
+osmTiles.on('load', () => { tileErrorNotice.hidden = tileErrorsInCurrentLoad === 0; });
 
 const ROHTAK_ORDER = ['E-32','E-28','E-27','E-26','E-25','E-24','E-23','E-22','E-21','E-20','E-19','E-16','K-3','E-11','E-10','E-9','E-2'];
 const REAL_DIST = {
