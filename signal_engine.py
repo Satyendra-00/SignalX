@@ -1,9 +1,11 @@
 import json
 import time
 from datetime import datetime
+from pathlib import Path
 
 # ── Load junction data ──────────────────────────────────────────────
-with open('junctions_geocoded.json') as f:
+data_path = Path(__file__).resolve().with_name('junctions_geocoded.json')
+with data_path.open(encoding='utf-8') as f:
     all_junctions = json.load(f)
 
 ROHTAK_CODES = [
