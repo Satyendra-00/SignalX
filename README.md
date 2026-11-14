@@ -1,4 +1,4 @@
-# SignalX ??
+# SignalX
 
 SignalX is a browser-based road navigation demo for Delhi junction data. It draws an OSRM driving route, looks up OpenStreetMap traffic-signal nodes near that route, and displays route progress and local signal schedule records.
 
