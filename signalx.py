@@ -14,15 +14,16 @@ Output:
 import os
 import re
 import json
+from pathlib import Path
 import pdfplumber
 
 # ─────────────────────────────────────────────
-# CONFIG — set PDF_FOLDER to the folder containing your PDFs
-# Example (Windows): PDF_FOLDER = r"C:\Users\YourName\Desktop\signals"
-# Example (Mac/Linux): PDF_FOLDER = "/home/yourname/signals
-PDF_FOLDER = r"D:\Desktop\Python_workshop\delhi_traffic_signals"   # "." means same folder as this script
-OUTPUT_FILE = "junctions.json"
-FAILED_FILE = "failed.txt"
+# Read source PDFs and write outputs relative to this project, regardless of the
+# current working directory used to launch the script.
+PROJECT_DIR = Path(__file__).resolve().parent
+PDF_FOLDER = PROJECT_DIR / "delhi_traffic_signals"
+OUTPUT_FILE = PROJECT_DIR / "junctions.json"
+FAILED_FILE = PROJECT_DIR / "failed.txt"
 # ─────────────────────────────────────────────
 
 
@@ -132,14 +133,14 @@ def extract_junction(pdf_path):
 
 
 def main():
-    pdf_files = [
-        os.path.join(PDF_FOLDER, f)
-        for f in os.listdir(PDF_FOLDER)
-        if f.lower().endswith(".pdf")
-    ]
+    if not PDF_FOLDER.is_dir():
+        print("PDF folder not found:", PDF_FOLDER)
+        return
+
+    pdf_files = sorted(PDF_FOLDER.glob("*.pdf"))
 
     if not pdf_files:
-        print("❌ No PDF files found in:", os.path.abspath(PDF_FOLDER))
+        print("❌ No PDF files found in:", PDF_FOLDER)
         return
 
     print(f"📂 Found {len(pdf_files)} PDF files. Starting extraction...\n")
@@ -147,7 +148,7 @@ def main():
     results = []
     failed  = []
 
-    for i, path in enumerate(sorted(pdf_files), 1):
+    for i, path in enumerate(pdf_files, 1):
         try:
             junction = extract_junction(path)
             results.append(junction)
@@ -156,7 +157,7 @@ def main():
             plans_count = len(junction.get("plans", []))
             print(f"  [{i:03}] ✅  {code} — {name}  ({plans_count} plan(s))")
         except Exception as e:
-            failed.append(path)
+            failed.append(str(path))
             print(f"  [{i:03}] ❌  {os.path.basename(path)} — ERROR: {e}")
 
     # Save results
