@@ -1,0 +1,19 @@
+﻿# Local credentials and deployment metadata
+.env
+.env.*
+!.env.example
+.vercel/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# JavaScript tooling (the dashboard itself has no build step)
+node_modules/
+
+# Operating system files
+.DS_Store
+Thumbs.db
