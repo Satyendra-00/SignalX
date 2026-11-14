@@ -530,7 +530,7 @@
             <div class="hour-value" id="info-amber" style="color:var(--accent2)"></div>
           </div>
         </div>
-        <div class="plans-title">Time Plans</div>
+        <div class="plans-title">Local schedule data (not live controller data)</div>
         <div id="info-plans"></div>
       </div>
     </div>
@@ -552,6 +552,12 @@ const DISTRICT_COLORS = {
   "Shahdara":    "#ff4081",
   "Outer":       "#a0a0a0",
 };
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[character]);
+}
 
 function getColor(district) {
   for (const key of Object.keys(DISTRICT_COLORS)) {
@@ -620,7 +626,10 @@ function buildFilters() {
   districts.forEach(d => {
     const btn = document.createElement('button');
     btn.className = 'filter-btn';
-    btn.innerHTML = `<span class="filter-dot" style="background:${getColor(d)}"></span> ${d}`;
+    const dot = document.createElement('span');
+    dot.className = 'filter-dot';
+    dot.style.background = getColor(d);
+    btn.append(dot, document.createTextNode(` ${d}`));
     btn.dataset.district = d;
     btn.addEventListener('click', () => filterByDistrict(d, btn));
     grid.appendChild(btn);
@@ -677,7 +686,7 @@ function renderAll(junctions) {
     // Marker
     const icon = L.divIcon({
       className: '',
-      html: `<div class="signal-marker" style="background:${color}22;border-color:${color};color:${color}">${(jn.junction_code||'').split('-')[1]||'•'}</div>`,
+      html: `<div class="signal-marker" style="background:${color}22;border-color:${color};color:${color}">${escapeHtml((jn.junction_code||'').split('-')[1]||'?')}</div>`,
       iconSize: [28, 28],
       iconAnchor: [14, 14],
     });
@@ -691,9 +700,9 @@ function renderAll(junctions) {
     item.className = 'junction-item';
     item.dataset.code = jn.junction_code;
     item.innerHTML = `
-      <div class="jn-code" style="color:${color}">${jn.junction_code || 'N/A'}</div>
-      <div class="jn-name">${jn.junction_name || 'Unknown'}</div>
-      <div class="jn-meta">${jn.district || ''} · ${(jn.plans||[]).length} plans</div>
+      <div class="jn-code" style="color:${color}">${escapeHtml(jn.junction_code || 'N/A')}</div>
+      <div class="jn-name">${escapeHtml(jn.junction_name || 'Unknown')}</div>
+      <div class="jn-meta">${escapeHtml(jn.district || '')} · ${(jn.plans||[]).length} plans</div>
     `;
     item.addEventListener('click', () => {
       map.setView([jn.lat, jn.lng], 15, { animate: true });
@@ -719,10 +728,10 @@ function showInfo(jn) {
     div.className = 'plan-row';
     div.innerHTML = `
       <div>
-        <div class="plan-time">${p.time_slot || ''}</div>
-        <div class="plan-phases">${(p.phases||[]).join('s + ')}s</div>
+        <div class="plan-time">${escapeHtml(p.time_slot || '')}</div>
+        <div class="plan-phases">${escapeHtml((p.phases||[]).join('s + '))}s</div>
       </div>
-      <div class="plan-cycle">${p.total_cycle_sec}s</div>
+      <div class="plan-cycle">${escapeHtml(p.total_cycle_sec ?? '')}s</div>
     `;
     plansDiv.appendChild(div);
   });
