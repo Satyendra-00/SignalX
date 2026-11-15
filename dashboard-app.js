@@ -194,13 +194,18 @@
     if (!signal || !signal.planRecord) return null;
     const now = new Date();
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const parseTime = value => {
+      const match = String(value || '').match(/^(\d{1,2}):(\d{2})$/);
+      if (!match) return null;
+      const hours = Number(match[1]);
+      const minutes = Number(match[2]);
+      if (hours > 23 || minutes > 59) return null;
+      return hours * 60 + minutes;
+    };
     for (const plan of signal.planRecord.plans) {
-      const startParts = String(plan.slot_start || '').split(':').map(Number);
-      const endParts = String(plan.slot_end || '').split(':').map(Number);
-      if (startParts.length !== 2 || endParts.length !== 2 ||
-          !startParts.every(Number.isFinite) || !endParts.every(Number.isFinite)) continue;
-      const start = startParts[0] * 60 + startParts[1];
-      const end = endParts[0] * 60 + endParts[1];
+      const start = parseTime(plan.slot_start);
+      const end = parseTime(plan.slot_end);
+      if (start === null || end === null) continue;
       if ((start <= end && currentMinutes >= start && currentMinutes < end) ||
           (start > end && (currentMinutes >= start || currentMinutes < end))) return plan;
     }
