@@ -12,8 +12,9 @@
 
   function isCoordinate(point) {
     return Array.isArray(point) && point.length >= 2 &&
-      Number.isFinite(Number(point[0])) && Number.isFinite(Number(point[1])) &&
-      Math.abs(Number(point[0])) <= 180 && Math.abs(Number(point[1])) <= 90;
+      typeof point[0] === 'number' && Number.isFinite(point[0]) &&
+      typeof point[1] === 'number' && Number.isFinite(point[1]) &&
+      Math.abs(point[0]) <= 180 && Math.abs(point[1]) <= 90;
   }
 
   function haversine(a, b) {
