@@ -93,11 +93,15 @@
     if (!Array.isArray(coordinates) || coordinates.length < 2 || !coordinates.every(isCoordinate)) {
       throw routeError('The route has no usable geometry.', 'INVALID_ROUTE');
     }
+    const padding = paddingMeters === undefined ? 250 : Number(paddingMeters);
+    if (!Number.isFinite(padding) || padding < 0) {
+      throw routeError('Signal lookup padding must be a nonnegative distance.', 'INVALID_PADDING');
+    }
     const lons = coordinates.map(point => point[0]);
     const lats = coordinates.map(point => point[1]);
     const middleLat = (Math.min(...lats) + Math.max(...lats)) / 2;
-    const padLat = (paddingMeters || 250) / 111320;
-    const padLng = (paddingMeters || 250) / Math.max(10000, 111320 * Math.cos(middleLat * Math.PI / 180));
+    const padLat = padding / 111320;
+    const padLng = padding / Math.max(10000, 111320 * Math.cos(middleLat * Math.PI / 180));
     return {
       south: Math.min(...lats) - padLat,
       west: Math.min(...lons) - padLng,
@@ -277,7 +281,7 @@
 
   async function fetchSignalsAlongRoute(coordinates, options) {
     const settings = options || {};
-    const bounds = routeBounds(coordinates, settings.paddingMeters || 250);
+    const bounds = routeBounds(coordinates, settings.paddingMeters);
     const area = (bounds.north - bounds.south) * (bounds.east - bounds.west);
     if (area > (settings.maxBoundsArea || 0.1)) {
       throw routeError('This route covers too large an area for a responsible public signal-data lookup.', 'SIGNAL_AREA_TOO_LARGE');
