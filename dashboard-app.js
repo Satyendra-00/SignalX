@@ -82,6 +82,8 @@
     if (type === 'src') sourceSelection = null;
     else destinationSelection = null;
     routeRequestId += 1;
+    goButton.disabled = false;
+    goButton.textContent = '▶ GO';
   };
 
   window.showSug = function (query, boxId, type) {
@@ -386,8 +388,10 @@
       resetRouteView();
       setRouteMessage(error.message || 'Routing failed. No route was drawn.', true);
     } finally {
-      goButton.disabled = false;
-      goButton.textContent = '▶ GO';
+      if (requestId === routeRequestId) {
+        goButton.disabled = false;
+        goButton.textContent = '▶ GO';
+      }
     }
   };
 
@@ -460,6 +464,8 @@
 
   window.startGPS = function () {
     routeRequestId += 1;
+    goButton.disabled = false;
+    goButton.textContent = '▶ GO';
     const badge = document.getElementById('gps-badge');
     badge.className = 'searching';
     badge.textContent = '📡 Getting GPS…';
@@ -509,6 +515,12 @@
 
   srcInput.addEventListener('blur', () => setTimeout(() => hideSug('src-sug'), 200));
   dstInput.addEventListener('blur', () => setTimeout(() => hideSug('dst-sug'), 200));
+  [srcInput, dstInput].forEach(input => input.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      goRoute();
+    }
+  }));
   fetch('junctions_geocoded.json').then(response => {
     if (!response.ok) throw new Error('Could not load junctions_geocoded.json.');
     return response.json();
