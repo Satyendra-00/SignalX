@@ -89,6 +89,9 @@
   }
 
   function routeBounds(coordinates, paddingMeters) {
+    if (!Array.isArray(coordinates)) {
+      throw routeError('The route has no usable geometry.', 'INVALID_ROUTE');
+    }
     const valid = coordinates.filter(isCoordinate);
     if (!valid.length) throw routeError('The route has no usable geometry.', 'INVALID_ROUTE');
     const lons = valid.map(point => Number(point[0]));
@@ -113,7 +116,8 @@
     if (!storage) return null;
     try {
       const entry = JSON.parse(storage.getItem(`signalx:osm-signals:${key}`) || 'null');
-      if (entry && Date.now() - entry.savedAt < SIGNAL_CACHE_TTL_MS && Array.isArray(entry.elements)) {
+      const age = entry && Date.now() - entry.savedAt;
+      if (entry && Number.isFinite(entry.savedAt) && age >= 0 && age < SIGNAL_CACHE_TTL_MS && Array.isArray(entry.elements)) {
         return entry.elements;
       }
     } catch (_) { /* Storage may be disabled or full; proceed without it. */ }
@@ -137,7 +141,7 @@
         if (Array.isArray(saved)) times = saved;
       } catch (_) { /* Use the in-memory limit when storage is unavailable. */ }
     }
-    times = times.filter(timestamp => Number.isFinite(timestamp) && now - timestamp < SIGNAL_QUERY_WINDOW_MS);
+    times = times.filter(timestamp => Number.isFinite(timestamp) && timestamp <= now && now - timestamp < SIGNAL_QUERY_WINDOW_MS);
     if (times.length >= MAX_SIGNAL_QUERIES_PER_DAY) {
       throw routeError('Signal lookup has reached this browser session’s daily request limit. The road route is still available.', 'SIGNAL_RATE_LIMIT');
     }
