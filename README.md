@@ -43,6 +43,8 @@ The browser app has no build step or JavaScript package dependencies. The route 
 node --test route-engine.test.js
 ```
 
+GitHub Actions runs this suite on each push and pull request.
+
 The PDF extraction utility requires `pdfplumber`; the PDF downloader requires `requests`. The static dashboard does not require Python packages.
 
 ## Data and privacy
