@@ -90,13 +90,11 @@
   }
 
   function routeBounds(coordinates, paddingMeters) {
-    if (!Array.isArray(coordinates)) {
+    if (!Array.isArray(coordinates) || coordinates.length < 2 || !coordinates.every(isCoordinate)) {
       throw routeError('The route has no usable geometry.', 'INVALID_ROUTE');
     }
-    const valid = coordinates.filter(isCoordinate);
-    if (!valid.length) throw routeError('The route has no usable geometry.', 'INVALID_ROUTE');
-    const lons = valid.map(point => Number(point[0]));
-    const lats = valid.map(point => Number(point[1]));
+    const lons = coordinates.map(point => point[0]);
+    const lats = coordinates.map(point => point[1]);
     const middleLat = (Math.min(...lats) + Math.max(...lats)) / 2;
     const padLat = (paddingMeters || 250) / 111320;
     const padLng = (paddingMeters || 250) / Math.max(10000, 111320 * Math.cos(middleLat * Math.PI / 180));
