@@ -332,7 +332,8 @@
     try {
       const routeKey = `${from.coordinates.join(',')}>${to.coordinates.join(',')}`;
       const cached = routeCache.get(routeKey);
-      if (cached && Date.now() - cached.savedAt < 5 * 60 * 1000) {
+      const cacheAge = cached && Date.now() - cached.savedAt;
+      if (cached && Number.isFinite(cached.savedAt) && cacheAge >= 0 && cacheAge < 5 * 60 * 1000) {
         routeData = cached.route;
       } else {
         const waitMs = Math.max(0, 1000 - (Date.now() - lastRoutingRequestAt));
