@@ -72,7 +72,8 @@
           : 'The routing service returned an invalid route. No route was drawn.';
         throw routeError(message, payload && payload.code || 'INVALID_ROUTE');
       }
-      if (!Number.isFinite(route.distance) || !Number.isFinite(route.duration)) {
+      if (!Number.isFinite(route.distance) || route.distance <= 0 ||
+          !Number.isFinite(route.duration) || route.duration < 0) {
         throw routeError('The routing service did not return a usable distance and duration.', 'INVALID_ROUTE');
       }
       return { coordinates, distanceM: route.distance, durationSec: route.duration, source: 'OSRM' };
