@@ -38,7 +38,15 @@
   const routeCache = new Map();
   const SIMULATED_SPEED_KMPH = 32;
   const MAX_CACHED_ROUTES = 40;
+  const indiaTimeFormatter = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23'
+  });
   const routeCumulative = () => routeData ? routeApi.cumulativeDistances(routeData.coordinates) : [];
+
+  function currentIndiaMinutes(date) {
+    const parts = Object.fromEntries(indiaTimeFormatter.formatToParts(date).map(part => [part.type, part.value]));
+    return Number(parts.hour) * 60 + Number(parts.minute);
+  }
 
   function cacheRoute(key, route) {
     routeCache.delete(key);
@@ -201,8 +209,7 @@
 
   function getActivePlan(signal) {
     if (!signal || !signal.planRecord) return null;
-    const now = new Date();
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const currentMinutes = currentIndiaMinutes(new Date());
     const parseTime = value => {
       const match = String(value || '').match(/^(\d{1,2}):(\d{2})$/);
       if (!match) return null;
@@ -481,7 +488,7 @@
   }
 
   function tick() {
-    document.getElementById('clock').textContent = `🕐 ${new Date().toLocaleTimeString('en-IN', { hour12: false })}`;
+    document.getElementById('clock').textContent = `🕐 ${indiaTimeFormatter.format(new Date())} IST`;
     if (!routeData) return;
     if (!gpsTracking) routeProgressM = Math.min(routeData.distanceM, routeProgressM + SIMULATED_SPEED_KMPH / 3.6);
     updateDashboard();
