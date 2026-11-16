@@ -14,6 +14,7 @@ Output:
 import os
 import re
 import json
+import tempfile
 from pathlib import Path
 import pdfplumber
 
@@ -23,6 +24,7 @@ import pdfplumber
 PROJECT_DIR = Path(__file__).resolve().parent
 PDF_FOLDER = PROJECT_DIR / "delhi_traffic_signals"
 OUTPUT_FILE = PROJECT_DIR / "junctions.json"
+PARTIAL_FILE = PROJECT_DIR / "junctions.partial.json"
 FAILED_FILE = PROJECT_DIR / "failed.txt"
 # ─────────────────────────────────────────────
 
@@ -132,6 +134,23 @@ def extract_junction(pdf_path):
     return data
 
 
+def write_json_atomically(path, data):
+    """Write JSON beside its destination, then replace it in one operation."""
+    temporary_path = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", dir=path.parent,
+            prefix=f".{path.name}.", suffix=".tmp", delete=False
+        ) as output:
+            temporary_path = Path(output.name)
+            json.dump(data, output, indent=2, ensure_ascii=False)
+            output.write("\n")
+        temporary_path.replace(path)
+    finally:
+        if temporary_path is not None and temporary_path.exists():
+            temporary_path.unlink()
+
+
 def main():
     if not PDF_FOLDER.is_dir():
         print("PDF folder not found:", PDF_FOLDER)
@@ -160,16 +179,17 @@ def main():
             failed.append(str(path))
             print(f"  [{i:03}] ❌  {os.path.basename(path)} — ERROR: {e}")
 
-    # Save results
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2, ensure_ascii=False)
-
     if failed:
+        write_json_atomically(PARTIAL_FILE, results)
         with open(FAILED_FILE, "w") as f:
             f.write("\n".join(failed))
         print(f"\n⚠️  {len(failed)} PDFs failed — listed in {FAILED_FILE}")
+        print(f"Partial results saved to {PARTIAL_FILE}; existing {OUTPUT_FILE.name} was kept unchanged.")
+    else:
+        write_json_atomically(OUTPUT_FILE, results)
 
-    print(f"\n✅ Done! {len(results)} junctions saved to '{OUTPUT_FILE}'")
+    saved_file = PARTIAL_FILE if failed else OUTPUT_FILE
+    print(f"\n✅ Done! {len(results)} junctions saved to '{saved_file}'")
     print(f"📍 {sum(1 for r in results if r['lat'])} have GPS coordinates")
     print(f"📋 {sum(len(r['plans']) for r in results)} total time plans extracted")
 
