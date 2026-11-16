@@ -212,11 +212,20 @@
     return null;
   }
 
-  function simulatedSignalPhase(plan) {
-    if (!plan || !Array.isArray(plan.phases) || !plan.phases.length || !plan.total_cycle_sec) return null;
+  function planTimings(plan) {
+    if (!plan || !Array.isArray(plan.phases) || !plan.phases.length) return null;
     const cycle = Number(plan.total_cycle_sec);
-    const phaseLengths = plan.phases.map(Number);
-    if (!Number.isFinite(cycle) || cycle <= 0 || phaseLengths.some(value => !Number.isFinite(value) || value <= 0)) return null;
+    const phases = plan.phases.map(Number);
+    if (!Number.isFinite(cycle) || cycle <= 0 ||
+        phases.some(value => !Number.isFinite(value) || value <= 0) ||
+        phases.reduce((total, value) => total + value, 0) > cycle) return null;
+    return { cycle, phases };
+  }
+
+  function simulatedSignalPhase(plan) {
+    const timings = planTimings(plan);
+    if (!timings) return null;
+    const { cycle, phases: phaseLengths } = timings;
     const position = Math.floor(Date.now() / 1000) % cycle;
     let elapsed = 0;
     for (let index = 0; index < phaseLengths.length; index += 1) {
@@ -230,10 +239,9 @@
   }
 
   function recommendation(distanceM, plan) {
-    if (!plan || distanceM <= 0) return null;
-    const cycle = Number(plan.total_cycle_sec);
-    const phases = (plan.phases || []).map(Number);
-    if (!Number.isFinite(cycle) || cycle <= 0 || !phases.length) return null;
+    const timings = planTimings(plan);
+    if (!timings || !Number.isFinite(distanceM) || distanceM <= 0) return null;
+    const { cycle, phases } = timings;
     const nowPosition = Math.floor(Date.now() / 1000) % cycle;
     const possible = [];
     for (let speed = 15; speed <= 80; speed += 1) {
