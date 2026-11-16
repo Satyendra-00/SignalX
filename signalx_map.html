@@ -449,6 +449,23 @@
     color: var(--text-dim);
     font-size: 13px;
   }
+
+  @media (max-width: 760px) {
+    body { height:100dvh; }
+    header { min-height:52px; height:auto; padding:8px 12px; gap:8px; }
+    .logo { gap:8px; }
+    .logo-sub { display:none; }
+    .header-stats { gap:10px; }
+    .stat-num { font-size:16px; }
+    .stat-label { font-size:8px; letter-spacing:0; }
+    .main { flex-direction:column; }
+    .sidebar { width:100%; max-height:48dvh; border-right:0; border-bottom:1px solid var(--border); }
+    .sidebar-section { padding:10px 12px; }
+    .filter-grid { grid-template-columns:repeat(3, minmax(0, 1fr)); }
+    .junction-list { min-height:90px; }
+    .map-stage { flex:1 1 0; min-height:42dvh; }
+    .info-panel { width:min(320px, calc(100% - 16px)); max-height:65%; overflow-y:auto; right:8px; bottom:8px; }
+  }
 </style>
 </head>
 <body>
