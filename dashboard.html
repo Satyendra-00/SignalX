@@ -12,7 +12,8 @@
     #topbar h1 { font-size:20px; color:#fff; letter-spacing:3px; font-weight:800; }
     #topbar h1 span { color:#4fc3f7; }
     #clock { font-size:13px; color:#4fc3f7; font-weight:600; }
-    #gps-badge { font-size:11px; padding:4px 10px; border-radius:20px; font-weight:600; cursor:pointer; }
+    #gps-badge { font-family:inherit; font-size:11px; padding:4px 10px; border-radius:20px; font-weight:600; cursor:pointer; }
+    #gps-badge:focus-visible { outline:2px solid #4fc3f7; outline-offset:2px; }
     #gps-badge.off       { background:rgba(100,100,100,0.2); color:#aaa; border:1px solid #555; }
     #gps-badge.searching { background:rgba(255,180,0,0.15); color:#ffcc00; border:1px solid #ffcc00; }
     #gps-badge.active    { background:rgba(0,200,100,0.15); color:#00e676; border:1px solid #00e676; }
@@ -115,7 +116,7 @@
 <body>
 <div id="topbar">
   <h1>⚡ SIGNAL<span>X</span></h1>
-  <div id="gps-badge" class="off" onclick="startGPS()">📡 Enable GPS</div>
+  <button id="gps-badge" type="button" class="off" onclick="startGPS()">📡 Enable GPS</button>
   <div id="clock"></div>
 </div>
 <div id="search-bar">
