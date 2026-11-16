@@ -37,7 +37,16 @@
   let lastRoutingRequestAt = 0;
   const routeCache = new Map();
   const SIMULATED_SPEED_KMPH = 32;
+  const MAX_CACHED_ROUTES = 40;
   const routeCumulative = () => routeData ? routeApi.cumulativeDistances(routeData.coordinates) : [];
+
+  function cacheRoute(key, route) {
+    routeCache.delete(key);
+    routeCache.set(key, { savedAt: Date.now(), route });
+    while (routeCache.size > MAX_CACHED_ROUTES) {
+      routeCache.delete(routeCache.keys().next().value);
+    }
+  }
 
   function setRouteMessage(message, isError) {
     const element = document.getElementById('route-status');
@@ -348,13 +357,15 @@
       const cacheAge = cached && Date.now() - cached.savedAt;
       if (cached && Number.isFinite(cached.savedAt) && cacheAge >= 0 && cacheAge < 5 * 60 * 1000) {
         routeData = cached.route;
+        cacheRoute(routeKey, cached.route);
       } else {
+        routeCache.delete(routeKey);
         const waitMs = Math.max(0, 1000 - (Date.now() - lastRoutingRequestAt));
         if (waitMs) await new Promise(resolve => setTimeout(resolve, waitMs));
         if (requestId !== routeRequestId) return;
         lastRoutingRequestAt = Date.now();
         routeData = await routeApi.fetchDrivingRoute(from.coordinates, to.coordinates);
-        routeCache.set(routeKey, { savedAt: Date.now(), route: routeData });
+        cacheRoute(routeKey, routeData);
       }
       if (requestId !== routeRequestId) return;
       routeData.cumulative = routeCumulative();
