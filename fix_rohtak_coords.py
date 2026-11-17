@@ -8,9 +8,11 @@ Run: python fix_rohtak_coords.py
 """
 
 import json
+from pathlib import Path
 
-INPUT_FILE  = "junctions_geocoded.json"
-OUTPUT_FILE = "junctions_geocoded.json"
+PROJECT_DIR = Path(__file__).resolve().parent
+INPUT_FILE = PROJECT_DIR / "junctions_geocoded.json"
+OUTPUT_FILE = PROJECT_DIR / "junctions_geocoded.json"
 
 # Manually verified coordinates — West to East along Rohtak Road
 ROHTAK_COORDS = {
@@ -35,7 +37,7 @@ ROHTAK_COORDS = {
 }
 
 def main():
-    with open(INPUT_FILE, "r", encoding="utf-8") as f:
+    with INPUT_FILE.open("r", encoding="utf-8") as f:
         junctions = json.load(f)
 
     updated = 0
@@ -47,15 +49,7 @@ def main():
             jn["lng"] = lng
             updated += 1
             print(f"  ✅  {code} — {jn.get('junction_name','')} → {lat}, {lng}")
-# Force fix E-2
-    for jn in junctions:
-        if jn.get('junction_code') == 'E-2':
-            jn['lat'] = 28.6378
-            jn['lng'] = 77.2289
-            updated += 1
-            print(f"  ✅  E-2 — Delhi Gate Chowk → 28.6378, 77.2289")
-
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+    with OUTPUT_FILE.open("w", encoding="utf-8") as f:
         json.dump(junctions, f, indent=2, ensure_ascii=False)
 
     print(f"\n✅ Updated {updated} Rohtak Road junctions with correct coordinates.")
