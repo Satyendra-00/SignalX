@@ -1,7 +1,9 @@
 import json
+from pathlib import Path
 
 # JSON file load karo
-with open("junctions_geocoded.json", "r", encoding="utf-8") as f:
+data_path = Path(__file__).resolve().with_name("junctions_geocoded.json")
+with data_path.open("r", encoding="utf-8") as f:
     data = json.load(f)
 
 # Route keywords
