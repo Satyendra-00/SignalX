@@ -45,6 +45,8 @@ def get_active_plan(junction):
 
 # ── Step 2: Find position in cycle using epoch offset ───────────────
 def get_cycle_position(cycle_length_sec):
+    if isinstance(cycle_length_sec, bool) or not isinstance(cycle_length_sec, int) or cycle_length_sec <= 0:
+        raise ValueError("Cycle length must be a positive integer number of seconds.")
     unix_now = int(time.time())
     position = unix_now % cycle_length_sec
     return position
@@ -52,6 +54,11 @@ def get_cycle_position(cycle_length_sec):
 
 # ── Step 3: Find which phase is active & seconds remaining ──────────
 def get_phase_info(phases, cycle_position):
+    if (not isinstance(phases, (list, tuple)) or not phases or
+            any(isinstance(duration, bool) or not isinstance(duration, int) or duration <= 0 for duration in phases) or
+            isinstance(cycle_position, bool) or not isinstance(cycle_position, int) or cycle_position < 0):
+        return None
+
     elapsed = 0
     for i, duration in enumerate(phases):
         if elapsed + duration > cycle_position:
@@ -95,6 +102,11 @@ def get_signal_status(junction, distance_meters):
 
     cycle   = plan['total_cycle_sec']
     phases  = plan['phases']
+    if (isinstance(cycle, bool) or not isinstance(cycle, int) or cycle <= 0 or
+            not isinstance(phases, list) or not phases or sum(phases) != cycle or
+            any(isinstance(duration, bool) or not isinstance(duration, int) or duration <= 0 for duration in phases)):
+        return f"{code} {name} — Invalid schedule data; guidance unavailable"
+
     pos     = get_cycle_position(cycle)
     info    = get_phase_info(phases, pos)
 
