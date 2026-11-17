@@ -1,9 +1,10 @@
 import os
+from pathlib import Path
 import requests
 
 # Create a folder to save your downloaded dataset
-output_folder = "delhi_traffic_signals"
-os.makedirs(output_folder, exist_ok=True)
+output_folder = Path(__file__).resolve().parent / "delhi_traffic_signals"
+output_folder.mkdir(parents=True, exist_ok=True)
 
 # Base URL path discovered from the files
 base_url = "https://traffic.delhipolice.gov.in/sites/default/files/uploads/2014/01/"
@@ -18,11 +19,11 @@ for circle in circles:
         
         try:
             # Send a request to see if the file exists
-            response = requests.get(file_url, timeout=5)
+            response = requests.get(file_url, timeout=(5, 20))
             
-            if response.status_code == 200:
+            if response.status_code == 200 and response.content.startswith(b"%PDF-"):
                 print(f"Found and Downloading: {filename}")
-                with open(os.path.join(output_folder, filename), 'wb') as f:
+                with (output_folder / filename).open('wb') as f:
                     f.write(response.content)
             else:
                 # File doesn't exist, skip quietly
