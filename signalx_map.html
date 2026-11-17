@@ -635,6 +635,7 @@ function buildFilters() {
   // All button
   const allBtn = document.createElement('button');
   allBtn.className = 'filter-btn active';
+  allBtn.setAttribute('aria-pressed', 'true');
   allBtn.innerHTML = `<span class="filter-dot" style="background:#888"></span> All`;
   allBtn.dataset.district = '';
   allBtn.addEventListener('click', () => filterByDistrict('', allBtn));
@@ -643,6 +644,7 @@ function buildFilters() {
   districts.forEach(d => {
     const btn = document.createElement('button');
     btn.className = 'filter-btn';
+    btn.setAttribute('aria-pressed', 'false');
     const dot = document.createElement('span');
     dot.className = 'filter-dot';
     dot.style.background = getColor(d);
@@ -655,8 +657,12 @@ function buildFilters() {
 
 function filterByDistrict(district, btn) {
   activeDistrict = district || null;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-pressed', 'false');
+  });
   btn.classList.add('active');
+  btn.setAttribute('aria-pressed', 'true');
   applyFilters();
 }
 
@@ -668,7 +674,7 @@ function applyFilters() {
   let filtered = allJunctions;
 
   if (activeDistrict) {
-    filtered = filtered.filter(j => (j.district || '').includes(activeDistrict));
+    filtered = filtered.filter(j => (j.district || '') === activeDistrict);
   }
   if (q) {
     filtered = filtered.filter(j =>
