@@ -113,7 +113,7 @@
 
   function boundsCacheKey(bounds) {
     return [bounds.south, bounds.west, bounds.north, bounds.east]
-      .map(value => Number(value).toFixed(3)).join(',');
+      .map(value => Number(value).toFixed(5)).join(',');
   }
 
   function readCachedElements(storage, key) {
