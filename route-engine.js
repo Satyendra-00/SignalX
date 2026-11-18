@@ -98,16 +98,24 @@
     if (!Number.isFinite(padding) || padding < 0) {
       throw routeError('Signal lookup padding must be a nonnegative distance.', 'INVALID_PADDING');
     }
-    const lons = coordinates.map(point => point[0]);
-    const lats = coordinates.map(point => point[1]);
-    const middleLat = (Math.min(...lats) + Math.max(...lats)) / 2;
+    let south = Infinity;
+    let west = Infinity;
+    let north = -Infinity;
+    let east = -Infinity;
+    for (const [longitude, latitude] of coordinates) {
+      south = Math.min(south, latitude);
+      west = Math.min(west, longitude);
+      north = Math.max(north, latitude);
+      east = Math.max(east, longitude);
+    }
+    const middleLat = (south + north) / 2;
     const padLat = padding / 111320;
     const padLng = padding / Math.max(10000, 111320 * Math.cos(middleLat * Math.PI / 180));
     return {
-      south: Math.min(...lats) - padLat,
-      west: Math.min(...lons) - padLng,
-      north: Math.max(...lats) + padLat,
-      east: Math.max(...lons) + padLng
+      south: south - padLat,
+      west: west - padLng,
+      north: north + padLat,
+      east: east + padLng
     };
   }
 
