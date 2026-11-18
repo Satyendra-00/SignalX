@@ -18,19 +18,32 @@ rohtak_junctions = [j for j in all_junctions if j.get('junction_code') in ROHTAK
 
 
 # ── Step 1: Get active plan for current time ────────────────────────
+def _minutes_since_midnight(value):
+    if not isinstance(value, str):
+        return None
+    parts = value.split(':')
+    if len(parts) != 2 or not all(part.isdigit() for part in parts):
+        return None
+    hour, minute = map(int, parts)
+    if not 0 <= hour <= 23 or not 0 <= minute <= 59:
+        return None
+    return hour * 60 + minute
+
+
 def get_active_plan(junction):
     now = datetime.now()
     current_minutes = now.hour * 60 + now.minute
 
-    for plan in junction.get('plans', []):
-        start = plan['slot_start']  # e.g. "08:00"
-        end   = plan['slot_end']    # e.g. "23:00"
-
-        sh, sm = map(int, start.split(':'))
-        eh, em = map(int, end.split(':'))
-
-        start_min = sh * 60 + sm
-        end_min   = eh * 60 + em
+    plans = junction.get('plans') or []
+    if not isinstance(plans, (list, tuple)):
+        return None
+    for plan in plans:
+        if not isinstance(plan, dict):
+            continue
+        start_min = _minutes_since_midnight(plan.get('slot_start'))
+        end_min = _minutes_since_midnight(plan.get('slot_end'))
+        if start_min is None or end_min is None:
+            continue
 
         # Handle overnight plans like 22:30 - 06:00
         if start_min <= end_min:
