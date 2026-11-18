@@ -282,15 +282,23 @@
 
   async function fetchSignalsAlongRoute(coordinates, options) {
     const settings = options || {};
+    const tolerance = settings.toleranceMeters === undefined
+      ? DEFAULT_CORRIDOR_METERS : settings.toleranceMeters;
+    const dedupe = settings.dedupeMeters === undefined ? 22 : settings.dedupeMeters;
+    const maxBoundsArea = settings.maxBoundsArea === undefined ? 0.1 : settings.maxBoundsArea;
+    if (!Number.isFinite(tolerance) || tolerance < 0 || !Number.isFinite(dedupe) || dedupe < 0) {
+      throw routeError('Signal matching distances must be finite, nonnegative numbers.', 'INVALID_SIGNAL_DISTANCE');
+    }
+    if (!Number.isFinite(maxBoundsArea) || maxBoundsArea <= 0) {
+      throw routeError('Signal lookup area limit must be a positive, finite number.', 'INVALID_BOUNDS_AREA');
+    }
     const bounds = routeBounds(coordinates, settings.paddingMeters);
     const area = (bounds.north - bounds.south) * (bounds.east - bounds.west);
-    if (area > (settings.maxBoundsArea || 0.1)) {
+    if (area > maxBoundsArea) {
       throw routeError('This route covers too large an area for a responsible public signal-data lookup.', 'SIGNAL_AREA_TOO_LARGE');
     }
     const nodes = await fetchOsmSignalNodes(bounds, settings);
-    return matchSignalsToRoute(nodes, coordinates,
-      settings.toleranceMeters === undefined ? DEFAULT_CORRIDOR_METERS : settings.toleranceMeters,
-      settings.dedupeMeters);
+    return matchSignalsToRoute(nodes, coordinates, tolerance, dedupe);
   }
 
   function coordinateAtDistance(coordinates, distanceM, cumulative) {
