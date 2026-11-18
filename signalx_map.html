@@ -530,7 +530,7 @@
           <div class="info-name" id="info-name"></div>
           <div class="info-district" id="info-district"></div>
         </div>
-        <button class="close-btn" onclick="closeInfo()">✕</button>
+        <button class="close-btn" aria-label="Close junction details" onclick="closeInfo()">✕</button>
       </div>
       <div class="info-body">
         <div class="signal-hours">
@@ -786,6 +786,10 @@ function closeInfo() {
   document.getElementById('info-panel').classList.remove('visible');
   document.querySelectorAll('.junction-item').forEach(el => el.classList.remove('selected'));
 }
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') closeInfo();
+});
 </script>
 </body>
 </html>
