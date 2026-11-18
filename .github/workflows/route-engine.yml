@@ -17,5 +17,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check Python utility syntax
+        run: >-
+          python -m py_compile
+          signalx.py signal_engine.py traffic.py check_rohtak.py
+          fix_rohtak_coords.py number.py
       - name: Run route engine tests
         run: node --test route-engine.test.js
