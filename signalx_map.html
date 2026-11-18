@@ -721,6 +721,8 @@ function renderAll(junctions) {
     // List item
     const item = document.createElement('div');
     item.className = 'junction-item';
+    item.setAttribute('role', 'button');
+    item.tabIndex = 0;
     item.dataset.code = jn.junction_code;
     item.innerHTML = `
       <div class="jn-code" style="color:${color}">${escapeHtml(jn.junction_code || 'N/A')}</div>
@@ -730,6 +732,12 @@ function renderAll(junctions) {
     item.addEventListener('click', () => {
       map.setView([jn.lat, jn.lng], 15, { animate: true });
       showInfo(jn);
+    });
+    item.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        item.click();
+      }
     });
     list.appendChild(item);
   });
