@@ -119,8 +119,10 @@ def get_signal_status(junction, distance_meters):
     cycle   = plan['total_cycle_sec']
     phases  = plan['phases']
     if (isinstance(cycle, bool) or not isinstance(cycle, int) or cycle <= 0 or
-            not isinstance(phases, list) or not phases or sum(phases) != cycle or
+            not isinstance(phases, list) or not phases or
             any(isinstance(duration, bool) or not isinstance(duration, int) or duration <= 0 for duration in phases)):
+        return f"{code} {name} — Invalid schedule data; guidance unavailable"
+    if sum(phases) != cycle:
         return f"{code} {name} — Invalid schedule data; guidance unavailable"
 
     pos     = get_cycle_position(cycle)
