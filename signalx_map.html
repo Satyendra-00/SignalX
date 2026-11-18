@@ -612,8 +612,12 @@ let selectedItem = null;
 let activeDistrict = null;
 
 fetch('junctions_geocoded.json')
-  .then(r => r.json())
+  .then(response => {
+    if (!response.ok) throw new Error(`Dataset request failed (${response.status}).`);
+    return response.json();
+  })
   .then(data => {
+    if (!Array.isArray(data)) throw new Error('Junction dataset must be a JSON array.');
     allJunctions = data.filter(j => j && Number.isFinite(j.lat) && Number.isFinite(j.lng));
     document.getElementById('stat-total').textContent = allJunctions.length;
     document.getElementById('stat-visible').textContent = allJunctions.length;
