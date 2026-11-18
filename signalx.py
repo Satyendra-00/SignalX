@@ -99,7 +99,7 @@ def extract_junction(pdf_path):
             plan_no = int(plan_no_match.group(1))
 
             # Time slot is column 1
-            time_slot = str(row[1]).strip() if row[1] else None
+            time_slot = str(row[1]).strip() if len(row) > 1 and row[1] else None
 
             # Parse start/end of time slot
             time_match = re.match(r"([\d:]+)\s*[-–]\s*([\d:]+)", time_slot or "")
