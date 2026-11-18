@@ -2,6 +2,9 @@ import json
 import time
 from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
+
+INDIA_TIME_ZONE = ZoneInfo('Asia/Kolkata')
 
 # ── Load junction data ──────────────────────────────────────────────
 data_path = Path(__file__).resolve().with_name('junctions_geocoded.json')
@@ -31,7 +34,7 @@ def _minutes_since_midnight(value):
 
 
 def get_active_plan(junction):
-    now = datetime.now()
+    now = datetime.now(INDIA_TIME_ZONE)
     current_minutes = now.hour * 60 + now.minute
 
     plans = junction.get('plans') or []
@@ -143,7 +146,7 @@ def get_signal_status(junction, distance_meters):
 # ── DEMO: Run for all Rohtak Road junctions ─────────────────────────
 if __name__ == "__main__":
     print(f"\nSignalX — Rohtak Road Corridor")
-    print(f"Current time: {datetime.now().strftime('%H:%M:%S')}")
+    print(f"Current time: {datetime.now(INDIA_TIME_ZONE).strftime('%H:%M:%S')} IST")
     print(f"Junctions loaded: {len(rohtak_junctions)}")
 
     # Simulate distances — as if you're driving from E-2 toward Mundka
