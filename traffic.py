@@ -1,34 +1,29 @@
-import os
 from pathlib import Path
 import requests
 
-# Create a folder to save your downloaded dataset
-output_folder = Path(__file__).resolve().parent / "delhi_traffic_signals"
-output_folder.mkdir(parents=True, exist_ok=True)
-
 # Base URL path discovered from the files
-base_url = "https://traffic.delhipolice.gov.in/sites/default/files/uploads/2014/01/"
+BASE_URL = "https://traffic.delhipolice.gov.in/sites/default/files/uploads/2014/01/"
+OUTPUT_FOLDER = Path(__file__).resolve().parent / "delhi_traffic_signals"
+CIRCLES = ['E', 'F', 'J', 'K', 'L', 'M']
 
-# Common traffic circle letter codes used by Delhi Police
-circles = ['E', 'F', 'J', 'K', 'L', 'M'] 
-# Loop through circles and intersection numbers 1 to 100
-for circle in circles:
-    for num in range(1, 101):
-        filename = f"{circle}-{num}.pdf"
-        file_url = f"{base_url}{filename}"
-        
-        try:
-            # Send a request to see if the file exists
-            response = requests.get(file_url, timeout=(5, 20))
-            
-            if response.status_code == 200 and response.content.startswith(b"%PDF-"):
-                print(f"Found and Downloading: {filename}")
-                with (output_folder / filename).open('wb') as f:
-                    f.write(response.content)
-            else:
-                # File doesn't exist, skip quietly
-                continue
-        except requests.exceptions.RequestException:
-            print(f"Failed to connect for {filename}")
+def main():
+    OUTPUT_FOLDER.mkdir(parents=True, exist_ok=True)
+    for circle in CIRCLES:
+        for num in range(1, 101):
+            filename = f"{circle}-{num}.pdf"
+            file_url = f"{BASE_URL}{filename}"
 
-print("Scanning complete!")
+            try:
+                response = requests.get(file_url, timeout=(5, 20))
+                if response.status_code == 200 and response.content.startswith(b"%PDF-"):
+                    print(f"Found and Downloading: {filename}")
+                    with (OUTPUT_FOLDER / filename).open('wb') as output_file:
+                        output_file.write(response.content)
+            except requests.exceptions.RequestException:
+                print(f"Failed to connect for {filename}")
+
+    print("Scanning complete!")
+
+
+if __name__ == "__main__":
+    main()
