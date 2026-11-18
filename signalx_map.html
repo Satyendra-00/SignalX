@@ -611,7 +611,7 @@ let activeDistrict = null;
 fetch('junctions_geocoded.json')
   .then(r => r.json())
   .then(data => {
-    allJunctions = data.filter(j => j.lat && j.lng);
+    allJunctions = data.filter(j => j && Number.isFinite(j.lat) && Number.isFinite(j.lng));
     document.getElementById('stat-total').textContent = allJunctions.length;
     document.getElementById('stat-visible').textContent = allJunctions.length;
 
