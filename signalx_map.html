@@ -618,7 +618,8 @@ fetch('junctions_geocoded.json')
   })
   .then(data => {
     if (!Array.isArray(data)) throw new Error('Junction dataset must be a JSON array.');
-    allJunctions = data.filter(j => j && Number.isFinite(j.lat) && Number.isFinite(j.lng));
+    allJunctions = data.filter(j => j && Number.isFinite(Number(j.lat)) && Number.isFinite(Number(j.lng)))
+      .map(j => ({ ...j, plans: Array.isArray(j.plans) ? j.plans : [] }));
     document.getElementById('stat-total').textContent = allJunctions.length;
     document.getElementById('stat-visible').textContent = allJunctions.length;
 
