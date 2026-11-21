@@ -557,6 +557,7 @@
     if (!response.ok) throw new Error('Could not load junctions_geocoded.json.');
     return response.json();
   }).then(data => {
+    if (!Array.isArray(data)) throw new Error('Junction dataset must be a JSON array.');
     allJunctions = data.filter(item => routeApi.isCoordinate([Number(item.lng), Number(item.lat)]));
     setRouteMessage(`${allJunctions.length} mapped dataset locations loaded. Pick a suggestion or enter coordinates.`);
   }).catch(() => setRouteMessage('Junction dataset could not be loaded. Coordinate entry still works.', true));
