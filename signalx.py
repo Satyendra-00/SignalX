@@ -181,7 +181,7 @@ def main():
 
     if failed:
         write_json_atomically(PARTIAL_FILE, results)
-        with open(FAILED_FILE, "w") as f:
+        with open(FAILED_FILE, "w", encoding="utf-8", newline="\n") as f:
             f.write("\n".join(failed))
         print(f"\n⚠️  {len(failed)} PDFs failed — listed in {FAILED_FILE}")
         print(f"Partial results saved to {PARTIAL_FILE}; existing {OUTPUT_FILE.name} was kept unchanged.")
