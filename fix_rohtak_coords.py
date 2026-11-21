@@ -8,6 +8,7 @@ Run: python fix_rohtak_coords.py
 """
 
 import json
+import tempfile
 from pathlib import Path
 
 PROJECT_DIR = Path(__file__).resolve().parent
@@ -49,8 +50,19 @@ def main():
             jn["lng"] = lng
             updated += 1
             print(f"  ✅  {code} — {jn.get('junction_name','')} → {lat}, {lng}")
-    with OUTPUT_FILE.open("w", encoding="utf-8") as f:
-        json.dump(junctions, f, indent=2, ensure_ascii=False)
+    temporary_path = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", dir=OUTPUT_FILE.parent,
+            prefix=f".{OUTPUT_FILE.name}.", suffix=".tmp", delete=False
+        ) as f:
+            temporary_path = Path(f.name)
+            json.dump(junctions, f, indent=2, ensure_ascii=False)
+            f.write("\n")
+        temporary_path.replace(OUTPUT_FILE)
+    finally:
+        if temporary_path is not None and temporary_path.exists():
+            temporary_path.unlink()
 
     print(f"\n✅ Updated {updated} Rohtak Road junctions with correct coordinates.")
     print(f"💾 Saved to '{OUTPUT_FILE}'")
