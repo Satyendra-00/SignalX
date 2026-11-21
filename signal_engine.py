@@ -1,4 +1,5 @@
 import json
+import math
 import time
 from datetime import datetime
 from pathlib import Path
@@ -91,6 +92,11 @@ def get_phase_info(phases, cycle_position):
 
 # ── Step 4: Recommend speed ─────────────────────────────────────────
 def recommend_speed(distance_meters, seconds_remaining):
+    if (isinstance(distance_meters, bool) or not isinstance(distance_meters, (int, float)) or
+            not math.isfinite(distance_meters) or distance_meters < 0 or
+            isinstance(seconds_remaining, bool) or not isinstance(seconds_remaining, (int, float)) or
+            not math.isfinite(seconds_remaining) or seconds_remaining <= 0):
+        raise ValueError("Distance must be nonnegative and remaining time must be positive and finite.")
     if seconds_remaining < 5:
         return "🔴 Stop — light changing now"
 
