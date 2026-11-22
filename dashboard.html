@@ -112,6 +112,26 @@
       #next-box { bottom:42px; right:8px; min-width:175px; padding:9px 11px; }
       #legend { bottom:8px; left:8px; padding:6px 8px; font-size:9px; }
     }
+  @media (max-width: 720px) {
+    #search-bar { padding:9px 10px; row-gap:8px; }
+    .search-label { margin-bottom:4px; font-size:8px; }
+    .s-wrap { flex-basis:calc(50% - 4px); min-width:0; }
+    #left-panel { max-height:45%; }
+    #panel-header { padding:11px 13px 9px; }
+    #empty-state { margin:8px; padding:16px 12px; border-radius:13px; }
+    #empty-state .icon { width:48px; height:48px; margin-bottom:8px; border-radius:15px; font-size:26px; }
+    #stats-bar { align-items:stretch; }
+    .stat-card { border-radius:10px; }
+  }
+  @media (max-width: 390px) {
+    #topbar { gap:8px; }
+    #topbar h1 { letter-spacing:2px; }
+    #gps-badge { padding:4px 7px; font-size:10px; }
+    .stat-card .slabel { font-size:7px; }
+    .stat-card .sunit { font-size:8px; }
+    #speed-circle { width:50px; height:50px; flex-basis:50px; }
+    #speed-circle .sc-val { font-size:17px; }
+  }
   /* Subtle depth across the dashboard canvas */
   body { background:radial-gradient(ellipse at 70% 8%,rgba(21,101,192,0.12),transparent 38%),#080d1b; }
   #main { background:#080d1b; }
