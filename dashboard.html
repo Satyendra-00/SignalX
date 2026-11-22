@@ -137,6 +137,14 @@
   .jrow.is-next { background:linear-gradient(90deg,rgba(21,101,192,0.25),rgba(21,101,192,0.08)); }
   .badge { border-radius:999px; padding:3px 9px; }
   #junction-list { scrollbar-width:thin; scrollbar-color:rgba(79,195,247,0.24) transparent; }
+  /* Floating map cards stay crisp over busy map tiles */
+  .stat-card, #speed-circle, #next-box, #legend { background:rgba(8,14,31,0.9); border-color:rgba(120,175,255,0.24); box-shadow:0 8px 24px rgba(0,0,0,0.2); }
+  .stat-card, #next-box { backdrop-filter:blur(14px) saturate(125%); }
+  .stat-card .sval { font-variant-numeric:tabular-nums; }
+  #speed-circle { box-shadow:0 0 20px rgba(255,23,68,0.12); }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior:auto !important; transition-duration:0.01ms !important; animation-duration:0.01ms !important; }
+  }
   </style>
 </head>
 <body>
