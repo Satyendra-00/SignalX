@@ -156,6 +156,12 @@
   .stat-card, #speed-circle, #next-box, #legend { background:rgba(8,14,31,0.9); border-color:rgba(120,175,255,0.24); box-shadow:0 8px 24px rgba(0,0,0,0.2); }
   .stat-card, #next-box { backdrop-filter:blur(14px) saturate(125%); }
   .stat-card .sval { font-variant-numeric:tabular-nums; }
+  #stats-bar { gap:10px; }
+  .stat-card { min-width:104px; padding:11px 16px 10px; border-radius:14px; }
+  .stat-card .slabel { color:#9aaccc; font-weight:700; }
+  .stat-card .sunit { color:#8398b8; }
+  .stat-card .sval { text-shadow:0 0 18px currentColor; }
+  #speed-circle { width:76px; height:76px; border-width:2px; }
   #speed-circle { box-shadow:0 0 20px rgba(255,23,68,0.12); }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior:auto !important; transition-duration:0.01ms !important; animation-duration:0.01ms !important; }
