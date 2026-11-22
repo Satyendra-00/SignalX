@@ -144,6 +144,12 @@
   .jrow { transition:background 0.18s,border-color 0.18s; }
   .jrow:hover { background:rgba(79,195,247,0.1); }
   .jrow.is-next { background:linear-gradient(90deg,rgba(21,101,192,0.25),rgba(21,101,192,0.08)); }
+  .jrow { min-height:59px; padding-top:11px; padding-bottom:11px; border-bottom-color:rgba(130,170,230,0.1); }
+  .jrow .col-num { width:34px; color:#7f98bb; font-size:10px; font-variant-numeric:tabular-nums; }
+  .jrow .col-name .jname { line-height:1.35; }
+  .jrow .col-name .jcode { color:#8398b8; line-height:1.4; }
+  .jrow:focus-visible { outline:2px solid #69d9ff; outline-offset:-2px; }
+  .jrow.is-next .col-num { color:#75dfff; }
   .badge { border-radius:999px; padding:3px 9px; }
   #junction-list { scrollbar-width:thin; scrollbar-color:rgba(79,195,247,0.24) transparent; }
   /* Floating map cards stay crisp over busy map tiles */
