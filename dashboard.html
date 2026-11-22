@@ -120,6 +120,7 @@
   #topbar h1 { letter-spacing:3.5px; }
   #clock { font-variant-numeric:tabular-nums; }
   /* More legible route search controls and keyboard focus */
+  .search-label { display:block; margin:0 0 5px 2px; color:rgba(190,210,255,0.62); font-size:9px; font-weight:700; letter-spacing:1.15px; }
   .s-wrap input { transition:border-color 0.18s,background 0.18s,box-shadow 0.18s; }
   .s-wrap input:focus { background:rgba(79,195,247,0.1); box-shadow:0 0 0 3px rgba(79,195,247,0.1); }
   #gps-btn, #go-btn { transition:transform 0.18s,background 0.18s,box-shadow 0.18s; }
@@ -156,12 +157,14 @@
 </div>
 <div id="search-bar">
   <div class="s-wrap">
+    <label class="search-label" for="src-input">STARTING POINT</label>
     <input type="text" id="src-input" placeholder="📍 Source (e.g. Mundka, E-32)"
       oninput="handleInputChange('src');showSug(this.value,'src-sug','src')"
       onblur="setTimeout(()=>hideSug('src-sug'),200)" autocomplete="off">
     <div class="sug-box" id="src-sug" style="display:none"></div>
   </div>
   <div class="s-wrap">
+    <label class="search-label" for="dst-input">DESTINATION</label>
     <input type="text" id="dst-input" placeholder="🏁 Destination (e.g. Delhi Gate, E-2)"
       oninput="handleInputChange('dst');showSug(this.value,'dst-sug','dst')"
       onblur="setTimeout(()=>hideSug('dst-sug'),200)" autocomplete="off">
