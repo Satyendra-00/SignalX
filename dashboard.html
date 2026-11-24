@@ -170,6 +170,15 @@
   .sug-item small { color:#7a8ba1; }
   #gps-btn { min-height:44px; padding:0 15px; background:#edf6f8; color:#16728a; border:1px solid #cfe5e9; border-radius:11px; }
   #go-btn { min-height:44px; padding:0 26px; background:linear-gradient(135deg,#087b96,#19a1b2); border-radius:11px; box-shadow:0 7px 16px rgba(8,123,150,0.2); }
+  /* Corridor context gets a quieter, more legible panel header */
+  #left-panel { width:370px; min-width:370px; box-shadow:5px 0 22px rgba(20,34,56,0.05); }
+  #panel-header { padding:19px 20px 16px; background:linear-gradient(145deg,#f7fafc,#fff); border-bottom:1px solid var(--sx-line); }
+  #corridor-title { color:var(--sx-ink); font-size:14px; font-weight:800; letter-spacing:1px; }
+  #corridor-sub { margin-top:6px; color:#617892; font-size:11px; line-height:1.5; }
+  #corridor-count:not(:empty) { display:inline-flex; margin-top:10px; padding:5px 9px; background:#eaf5f7; border:1px solid #d4e9ed; border-radius:999px; color:#27778a; font-size:10px; font-weight:700; }
+  #route-status:not(:empty) { margin-top:10px; padding:8px 10px; background:#f0f7f8; border-left:3px solid var(--sx-blue); border-radius:0 8px 8px 0; color:#36536b; font-size:11px; }
+  #route-status.error { background:#fff3f1; border-left-color:#d96858; color:#a64439; }
+  #list-header { background:#f5f8fb; border-bottom-color:var(--sx-line); color:#718198; }
   </style>
 </head>
 <body>
