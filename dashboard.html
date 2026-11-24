@@ -202,6 +202,26 @@
   #gps-btn:hover { background:#e4f2f4; }
   #go-btn:hover { transform:translateY(-1px); box-shadow:0 10px 20px rgba(8,123,150,.27); }
   #gps-btn:focus-visible, #go-btn:focus-visible { outline:3px solid rgba(22,132,160,.35); outline-offset:2px; }
+  /* Map data floats above the basemap as crisp, light information cards */
+  .stat-card, #speed-circle, #next-box, #legend { background:rgba(255,255,255,.96); border:1px solid rgba(209,220,231,.95); box-shadow:0 10px 28px rgba(25,45,72,.13); color:var(--sx-ink); }
+  .stat-card, #next-box, #legend { backdrop-filter:blur(12px); }
+  .stat-card { min-width:104px; padding:11px 15px 10px; border-radius:14px; }
+  .stat-card .slabel { color:#6f8198; font-size:9px; font-weight:800; letter-spacing:.85px; }
+  .stat-card .sunit { color:#8191a4; }
+  .stat-card .sval { font-variant-numeric:tabular-nums; text-shadow:none; }
+  #speed-circle { width:74px; height:74px; border:2px solid #d96867; background:rgba(255,255,255,.97); }
+  #speed-circle .sc-val { color:#c4494c; }
+  #speed-circle .sc-lbl { color:#7e8da0; }
+  #next-box { min-width:220px; padding:15px 17px; border-radius:15px; }
+  #next-box .nb-label { color:#718198; font-weight:800; letter-spacing:1px; }
+  #next-box .nb-name { color:#172941; }
+  #next-box .nb-row { color:#50657d; }
+  #next-box .nb-bar { background:#e8eef4; }
+  #next-box .nb-cycle { color:#718198 !important; line-height:1.5; }
+  #legend { padding:10px 13px; border-radius:13px; color:#425770; font-size:10px; line-height:1.9; }
+  #legend div:last-child { margin-top:4px; padding-top:5px; border-top:1px solid #e8edf2; }
+  #legend a { color:#147c92; text-decoration:none; }
+  #legend a:hover { text-decoration:underline; }
   </style>
 </head>
 <body>
