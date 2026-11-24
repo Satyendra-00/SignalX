@@ -179,6 +179,10 @@
   #route-status:not(:empty) { margin-top:10px; padding:8px 10px; background:#f0f7f8; border-left:3px solid var(--sx-blue); border-radius:0 8px 8px 0; color:#36536b; font-size:11px; }
   #route-status.error { background:#fff3f1; border-left-color:#d96858; color:#a64439; }
   #list-header { background:#f5f8fb; border-bottom-color:var(--sx-line); color:#718198; }
+  /* A friendlier first-run state keeps the blank panel intentional */
+  #empty-state { flex:1; margin:16px; padding:28px 20px; border:1px solid #e5ebf1; border-radius:18px; background:linear-gradient(155deg,#fff,#f7fafc); color:#718198; }
+  #empty-state .icon { width:64px; height:64px; display:grid; place-items:center; margin:0 0 16px; border:1px solid #d7ebee; border-radius:20px; background:linear-gradient(145deg,#eaf7f8,#f4fbfb); color:#147f97; font-size:33px; box-shadow:0 8px 18px rgba(22,132,160,0.08); }
+  #empty-state p { max-width:250px; color:#64758b; font-size:12px; line-height:1.8; }
   </style>
 </head>
 <body>
