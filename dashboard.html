@@ -222,6 +222,34 @@
   #legend div:last-child { margin-top:4px; padding-top:5px; border-top:1px solid #e8edf2; }
   #legend a { color:#147c92; text-decoration:none; }
   #legend a:hover { text-decoration:underline; }
+  /* Keep the new visual hierarchy usable on narrow screens */
+  @media (max-width:720px) {
+    body { height:100dvh; }
+    #topbar { min-height:56px; padding:8px 12px; }
+    .brand-lockup { gap:0; }
+    .brand-caption { display:none; }
+    #topbar h1 { font-size:17px; letter-spacing:2px; }
+    #clock { font-size:10px; }
+    #search-bar { padding:10px; gap:8px; row-gap:8px; flex-wrap:wrap; align-items:flex-end; }
+    .s-wrap { flex:1 1 calc(50% - 8px); min-width:calc(50% - 8px); }
+    .s-wrap input { min-height:40px; padding:9px 10px; font-size:12px; }
+    #gps-btn, #go-btn { min-height:40px; flex:1 1 calc(50% - 8px); padding:0 10px; }
+    #main { flex-direction:column; }
+    #left-panel { width:100%; min-width:0; max-height:40dvh; border-right:0; border-bottom:1px solid var(--sx-line); }
+    #panel-header { padding:11px 13px 9px; }
+    #empty-state { min-height:100px; margin:8px; padding:14px 12px; }
+    #empty-state .icon { width:46px; height:46px; margin-bottom:8px; border-radius:15px; font-size:25px; }
+    #map-wrap { flex:1 1 0; min-height:200px; }
+    #stats-bar { top:8px; width:calc(100% - 12px); gap:4px; justify-content:center; }
+    .stat-card { min-width:0; flex:1; padding:6px 3px; border-radius:9px; }
+    .stat-card .sval { font-size:19px; }
+    .stat-card .slabel { font-size:7px; letter-spacing:0; }
+    .stat-card .sunit { font-size:8px; }
+    #speed-circle { width:52px; height:52px; flex:0 0 52px; }
+    #speed-circle .sc-val { font-size:18px; }
+    #next-box { right:8px; bottom:40px; min-width:165px; max-width:52%; padding:10px 11px; }
+    #legend { left:8px; bottom:8px; max-width:44%; padding:7px 8px; font-size:8px; line-height:1.7; }
+  }
   </style>
 </head>
 <body>
