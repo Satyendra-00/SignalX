@@ -149,11 +149,21 @@
   #search-bar { background:var(--sx-paper); border-bottom-color:var(--sx-line); }
   #left-panel { background:var(--sx-paper); border-right-color:var(--sx-line); }
   #map-wrap { background:#e5ebf1; }
+  /* The header now reads like a compact product masthead */
+  #topbar { min-height:68px; padding:10px 24px; border-bottom:0; box-shadow:0 8px 22px rgba(16,33,58,0.14); }
+  .brand-lockup { display:flex; align-items:center; gap:17px; }
+  #topbar h1 { font-size:21px; letter-spacing:2.5px; }
+  .brand-caption { padding-left:16px; border-left:1px solid rgba(255,255,255,0.16); color:#a7bbd2; font-size:9px; font-weight:700; letter-spacing:1.45px; }
+  .brand-caption span { color:var(--sx-cyan); padding:0 3px; }
+  #clock { color:#c1d4e8; font-size:12px; font-variant-numeric:tabular-nums; }
   </style>
 </head>
 <body>
 <div id="topbar">
-  <h1>⚡ SIGNAL<span>X</span></h1>
+  <div class="brand-lockup">
+    <h1>⚡ SIGNAL<span>X</span></h1>
+    <div class="brand-caption">DELHI <span>?</span> TRAFFIC INTELLIGENCE</div>
+  </div>
   <button id="gps-badge" type="button" class="off" onclick="startGPS()">📡 Enable GPS</button>
   <div id="clock"></div>
 </div>
