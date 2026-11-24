@@ -132,68 +132,23 @@
     #speed-circle { width:50px; height:50px; flex-basis:50px; }
     #speed-circle .sc-val { font-size:17px; }
   }
-  /* Subtle depth across the dashboard canvas */
-  body { background:radial-gradient(ellipse at 70% 8%,rgba(21,101,192,0.12),transparent 38%),#080d1b; }
-  #main { background:#080d1b; }
-  /* A clearer, calmer hierarchy in the header */
-  #topbar { background:linear-gradient(115deg,#101d3b 0%,#142858 58%,#102044 100%); box-shadow:0 5px 20px rgba(0,0,0,0.2); }
-  #topbar h1 { letter-spacing:3.5px; }
-  #clock { font-variant-numeric:tabular-nums; }
-  /* More legible route search controls and keyboard focus */
-  .search-label { display:block; margin:0 0 5px 2px; color:rgba(190,210,255,0.62); font-size:9px; font-weight:700; letter-spacing:1.15px; }
-  .s-wrap input { transition:border-color 0.18s,background 0.18s,box-shadow 0.18s; }
-  .s-wrap input:focus { background:rgba(79,195,247,0.1); box-shadow:0 0 0 3px rgba(79,195,247,0.1); }
-  #gps-btn, #go-btn { transition:transform 0.18s,background 0.18s,box-shadow 0.18s; }
-  #gps-btn:hover { background:rgba(79,195,247,0.18); }
-  #gps-btn:focus-visible, #go-btn:focus-visible { outline:2px solid #8be3ff; outline-offset:3px; }
-  #go-btn:hover { box-shadow:0 5px 20px rgba(2,136,209,0.35); }
-  /* Give the route panel a softer, layered surface */
-  #left-panel { background:linear-gradient(180deg,rgba(13,21,44,0.98),rgba(8,13,29,0.98)); }
-  #panel-header { padding:17px 18px 14px; }
-  #corridor-title { font-size:15px; }
-  #corridor-sub { color:#82dcff; line-height:1.5; }
-  #corridor-count:not(:empty) { display:inline-flex; margin-top:8px; padding:4px 8px; border:1px solid rgba(79,195,247,0.18); border-radius:999px; background:rgba(79,195,247,0.08); color:#9db8d8; }
-  #panel-header { background:linear-gradient(135deg,rgba(21,101,192,0.3),rgba(13,20,45,0.35)); }
-  #corridor-title { letter-spacing:1.2px; }
-  #route-status:not(:empty) { padding:7px 9px; background:rgba(79,195,247,0.06); border-left:2px solid rgba(79,195,247,0.55); border-radius:0 6px 6px 0; }
-  #empty-state { position:relative; margin:14px; padding:28px 20px; border:1px solid rgba(117,160,220,0.12); border-radius:16px; background:radial-gradient(circle at 50% 0,rgba(26,91,174,0.14),transparent 65%),rgba(255,255,255,0.015); color:#a8bad5; }
-  #empty-state .icon { width:68px; height:68px; display:grid; place-items:center; margin-bottom:16px; border:1px solid rgba(79,195,247,0.22); border-radius:20px; background:rgba(79,195,247,0.08); filter:drop-shadow(0 8px 20px rgba(0,0,0,0.22)); }
-  #empty-state p { max-width:250px; color:#a8bad5; }
-  /* Clearer signal rows and a more visible next stop */
-  #list-header { background:rgba(21,101,192,0.18); color:rgba(190,210,255,0.68); }
-  .jrow { transition:background 0.18s,border-color 0.18s; }
-  .jrow:hover { background:rgba(79,195,247,0.1); }
-  .jrow.is-next { background:linear-gradient(90deg,rgba(21,101,192,0.25),rgba(21,101,192,0.08)); }
-  .jrow { min-height:59px; padding-top:11px; padding-bottom:11px; border-bottom-color:rgba(130,170,230,0.1); }
-  .jrow .col-num { width:34px; color:#7f98bb; font-size:10px; font-variant-numeric:tabular-nums; }
-  .jrow .col-name .jname { line-height:1.35; }
-  .jrow .col-name .jcode { color:#8398b8; line-height:1.4; }
-  .jrow:focus-visible { outline:2px solid #69d9ff; outline-offset:-2px; }
-  .jrow.is-next .col-num { color:#75dfff; }
-  .badge { border-radius:999px; padding:3px 9px; }
-  #junction-list { scrollbar-width:thin; scrollbar-color:rgba(79,195,247,0.24) transparent; }
-  /* Floating map cards stay crisp over busy map tiles */
-  .stat-card, #speed-circle, #next-box, #legend { background:rgba(8,14,31,0.9); border-color:rgba(120,175,255,0.24); box-shadow:0 8px 24px rgba(0,0,0,0.2); }
-  .stat-card, #next-box { backdrop-filter:blur(14px) saturate(125%); }
-  .stat-card .sval { font-variant-numeric:tabular-nums; }
-  #stats-bar { gap:10px; }
-  .stat-card { min-width:104px; padding:11px 16px 10px; border-radius:14px; }
-  .stat-card .slabel { color:#9aaccc; font-weight:700; }
-  .stat-card .sunit { color:#8398b8; }
-  .stat-card .sval { text-shadow:0 0 18px currentColor; }
-  #speed-circle { width:76px; height:76px; border-width:2px; }
-  #legend { padding:10px 13px; border-radius:12px; color:#d3def2; line-height:1.85; }
-  #legend .dot { width:8px; height:8px; box-shadow:0 0 9px currentColor; }
-  #legend div:last-child { margin-top:4px; padding-top:5px; border-top:1px solid rgba(130,170,230,0.12); }
-  #legend a { text-decoration:none; }
-  #legend a:hover { text-decoration:underline; }
-  #next-box { border-radius:14px; padding:14px 16px; }
-  #next-box .nb-label { color:#88a4c9; font-weight:700; letter-spacing:1.1px; }
-  #next-box .nb-name { line-height:1.35; }
-  #speed-circle { box-shadow:0 0 20px rgba(255,23,68,0.12); }
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { scroll-behavior:auto !important; transition-duration:0.01ms !important; animation-duration:0.01ms !important; }
+  /* SignalX visual refresh: clean daylight map with a deep navigation header */
+  :root {
+    --sx-ink:#142238;
+    --sx-navy:#10213a;
+    --sx-blue:#1684a0;
+    --sx-cyan:#43c5d5;
+    --sx-muted:#718198;
+    --sx-line:#dce5ee;
+    --sx-paper:#ffffff;
+    --sx-canvas:#edf2f7;
   }
+  body { background:var(--sx-canvas); color:var(--sx-ink); font-family:Inter,'Segoe UI',sans-serif; }
+  #main { background:var(--sx-canvas); }
+  #topbar { background:var(--sx-navy); }
+  #search-bar { background:var(--sx-paper); border-bottom-color:var(--sx-line); }
+  #left-panel { background:var(--sx-paper); border-right-color:var(--sx-line); }
+  #map-wrap { background:#e5ebf1; }
   </style>
 </head>
 <body>
