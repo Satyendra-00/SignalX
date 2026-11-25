@@ -189,6 +189,15 @@
   .empty-steps { display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin-top:18px; }
   .empty-steps span { padding:6px 8px; border:1px solid #e1e9f0; border-radius:999px; background:#fff; color:#6e7f94; font-size:9px; font-weight:700; }
   .empty-steps b { margin-right:3px; color:#16849a; font-size:8px; }
+  /* Give each signal its own compact, scannable card */
+  #junction-list { padding:9px 10px; background:#f8fafc; scrollbar-width:thin; scrollbar-color:#c4d2df transparent; }
+  .jrow { min-height:62px; margin:0 0 6px; padding:10px 11px; border:1px solid #e7edf3; border-radius:11px; background:#fff; box-shadow:0 2px 5px rgba(20,34,56,.025); transition:transform .16s,box-shadow .16s,border-color .16s,background .16s; }
+  .jrow:hover { transform:translateY(-1px); border-color:#c9dfe4; background:#fff; box-shadow:0 6px 14px rgba(20,34,56,.07); }
+  .jrow.is-next { border-color:#8acbd3; border-left:3px solid #148ba0; padding-left:9px; background:linear-gradient(100deg,#eaf7f8,#fff 84%); }
+  .jrow .col-num { width:31px; color:#91a1b4; font-size:10px; font-variant-numeric:tabular-nums; }
+  .jrow .col-name .jname { color:#1a2b41; font-size:12px; line-height:1.35; }
+  .jrow .col-name .jcode { margin-top:3px; color:#8292a6; font-size:9px; line-height:1.35; }
+  .jrow .col-time { font-size:12px; font-variant-numeric:tabular-nums; }
   /* Junctions scan as individual stops instead of one dense table */
   #junction-list { padding:9px 10px; background:#f8fafc; scrollbar-width:thin; scrollbar-color:#c4d2df transparent; }
   .jrow { min-height:62px; margin:0 0 6px; padding:10px 11px; border:1px solid #e7edf3; border-radius:11px; background:#fff; box-shadow:0 2px 5px rgba(20,34,56,0.025); transition:transform .16s,box-shadow .16s,border-color .16s,background .16s; }
