@@ -198,6 +198,16 @@
   .jrow .col-name .jname { color:#1a2b41; font-size:12px; line-height:1.35; }
   .jrow .col-name .jcode { margin-top:3px; color:#8292a6; font-size:9px; line-height:1.35; }
   .jrow .col-time { font-size:12px; font-variant-numeric:tabular-nums; }
+  /* Signal states remain distinct without harsh full-strength fills */
+  .badge { padding:4px 8px; border:1px solid transparent; border-radius:999px; font-size:9px; font-weight:800; letter-spacing:.35px; }
+  .badge.go { background:#e7f7ed; border-color:#caecd7; color:#217443; }
+  .badge.slow { background:#fff4dc !important; border-color:#f3dfad !important; color:#946315 !important; }
+  .badge.stop { background:#ffeded; border-color:#f3cece; color:#ad3c42; }
+  .jrow:focus-visible { outline:3px solid rgba(22,132,160,.36); outline-offset:1px; }
+  #gps-btn, #go-btn { cursor:pointer; transition:transform .16s,box-shadow .16s,background .16s; }
+  #gps-btn:hover { background:#e4f2f4; }
+  #go-btn:hover { transform:translateY(-1px); box-shadow:0 10px 20px rgba(8,123,150,.27); }
+  #gps-btn:focus-visible, #go-btn:focus-visible { outline:3px solid rgba(22,132,160,.35); outline-offset:2px; }
   /* Junctions scan as individual stops instead of one dense table */
   #junction-list { padding:9px 10px; background:#f8fafc; scrollbar-width:thin; scrollbar-color:#c4d2df transparent; }
   .jrow { min-height:62px; margin:0 0 6px; padding:10px 11px; border:1px solid #e7edf3; border-radius:11px; background:#fff; box-shadow:0 2px 5px rgba(20,34,56,0.025); transition:transform .16s,box-shadow .16s,border-color .16s,background .16s; }
