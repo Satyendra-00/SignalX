@@ -183,6 +183,12 @@
   #empty-state { flex:1; margin:16px; padding:28px 20px; border:1px solid #e5ebf1; border-radius:18px; background:linear-gradient(155deg,#fff,#f7fafc); color:#718198; }
   #empty-state .icon { width:64px; height:64px; display:grid; place-items:center; margin:0 0 16px; border:1px solid #d7ebee; border-radius:20px; background:linear-gradient(145deg,#eaf7f8,#f4fbfb); color:#147f97; font-size:33px; box-shadow:0 8px 18px rgba(22,132,160,0.08); }
   #empty-state p { max-width:250px; color:#64758b; font-size:12px; line-height:1.8; }
+  .empty-kicker { color:#18849a; font-size:9px; font-weight:800; letter-spacing:1.5px; }
+  #empty-state h2 { margin-top:7px; color:#172a42; font-size:18px; letter-spacing:-.35px; }
+  #empty-state p { margin-top:8px; }
+  .empty-steps { display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin-top:18px; }
+  .empty-steps span { padding:6px 8px; border:1px solid #e1e9f0; border-radius:999px; background:#fff; color:#6e7f94; font-size:9px; font-weight:700; }
+  .empty-steps b { margin-right:3px; color:#16849a; font-size:8px; }
   /* Junctions scan as individual stops instead of one dense table */
   #junction-list { padding:9px 10px; background:#f8fafc; scrollbar-width:thin; scrollbar-color:#c4d2df transparent; }
   .jrow { min-height:62px; margin:0 0 6px; padding:10px 11px; border:1px solid #e7edf3; border-radius:11px; background:#fff; box-shadow:0 2px 5px rgba(20,34,56,0.025); transition:transform .16s,box-shadow .16s,border-color .16s,background .16s; }
@@ -330,8 +336,11 @@
       <div id="route-status" role="status" aria-live="polite"></div>
     </div>
     <div id="empty-state">
-      <div class="icon">🚦</div>
-      <p>Choose your <b style="color:#4fc3f7">source</b> and <b style="color:#4fc3f7">destination</b>,<br>then press <b style="color:#fff;background:#1565c0;padding:2px 8px;border-radius:4px">GO</b><br>to see the road route and mapped signals.</p>
+      <div class="icon">&#128680;</div>
+      <div class="empty-kicker">READY WHEN YOU ARE</div>
+      <h2>Plan your drive</h2>
+      <p>Choose a starting point and destination to see your route and nearby signals.</p>
+      <div class="empty-steps"><span><b>01</b> Start</span><span><b>02</b> Destination</span><span><b>03</b> Route</span></div>
     </div>
     <div id="list-header">
       <div class="col-num">#</div>
