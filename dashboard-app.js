@@ -437,7 +437,7 @@
     document.getElementById('stat-dist').textContent = Math.round(remaining);
     document.getElementById('stat-rec').textContent = '--';
     document.getElementById('speed-circle').style.borderColor = '#4fc3f7';
-    document.getElementById('stat-rec').style.color = '#4fc3f7';
+    document.getElementById('stat-rec').style.color = '#b84649';
     const name = document.getElementById('nb-name');
     const now = document.getElementById('nb-now');
     const time = document.getElementById('nb-time');
@@ -446,7 +446,7 @@
     const arrival = document.getElementById('nb-arrive');
     if (!next) {
       document.getElementById('stat-signal').textContent = '--';
-      document.getElementById('stat-signal').style.color = '#fff';
+      document.getElementById('stat-signal').style.color = '#218251';
       name.textContent = routeProgressM >= routeData.distanceM ? 'Destination reached' : 'No next mapped signal';
       now.textContent = 'Status: OSM signal sequence';
       now.style.color = '#4fc3f7';
@@ -461,7 +461,7 @@
       const phase = simulatedSignalPhase(plan);
       const rec = plan ? recommendation(distance, plan) : null;
       document.getElementById('stat-signal').textContent = Math.round(distance);
-      document.getElementById('stat-signal').style.color = '#fff';
+      document.getElementById('stat-signal').style.color = '#218251';
       name.textContent = next.code ? `${next.code} — ${next.displayName}` : next.displayName;
       now.textContent = phase ? `SIMULATED ${phase.isGreen ? 'GREEN' : 'RED'}` : 'Phase timing unavailable';
       now.style.color = phase ? (phase.isGreen ? '#00e676' : '#ff1744') : '#ffab00';
