@@ -314,6 +314,29 @@
   #route-status:not(:empty) { margin-top:10px; padding:8px 10px; background:#f0f7f8; border-left:3px solid var(--sx-blue); border-radius:0 8px 8px 0; color:#36536b; font-size:11px; }
   #route-status.error { background:#fff3f1; border-left-color:#d96858; color:#a64439; }
   #list-header { background:#f5f8fb; border-bottom-color:var(--sx-line); color:#718198; }
+  /* Clear floating map controls against both roads and buildings */
+  #stats-bar { gap:10px; }
+  .stat-card, #speed-circle, #next-box, #legend { background:rgba(255,255,255,.96); border-color:rgba(209,220,231,.95); box-shadow:0 10px 28px rgba(25,45,72,.13); color:var(--sx-ink); }
+  .stat-card, #next-box, #legend { backdrop-filter:blur(12px); }
+  .stat-card { min-width:104px; padding:11px 15px 10px; border-radius:14px; }
+  .stat-card .slabel { color:#6f8198; font-size:9px; font-weight:800; letter-spacing:.85px; }
+  .stat-card .sunit { color:#8191a4; }
+  .stat-card .sval { font-variant-numeric:tabular-nums; }
+  #speed-circle { width:74px; height:74px; border:2px solid #c65a5c; }
+  #speed-circle .sc-val { color:#b84649; }
+  #speed-circle .sc-lbl { color:#7e8da0; }
+  #next-box { min-width:220px; padding:15px 17px; border-radius:15px; }
+  #next-box .nb-label { color:#718198; font-weight:800; letter-spacing:1px; }
+  #next-box .nb-name { color:#172941; }
+  #next-box .nb-row { color:#50657d; }
+  #next-box .nb-bar { background:#e8eef4; }
+  #next-box .nb-cycle { color:#718198 !important; }
+  #next-box .nb-arrive { line-height:1.45; }
+  #legend { padding:10px 13px; border-radius:13px; color:#425770; font-size:10px; line-height:1.9; }
+  #legend div:last-child { margin-top:4px; padding-top:5px; border-top:1px solid #e8edf2; }
+  #legend a { color:#147c92; text-decoration:none; }
+  #legend a:hover { text-decoration:underline; }
+  #map-tile-error { background:rgba(255,255,255,.97); border-color:#efd38b; border-radius:10px; color:#805f18; box-shadow:0 8px 22px rgba(25,45,72,.13); }
   </style>
 </head>
 <body>
@@ -401,7 +424,7 @@
         <span id="nb-time">Left: —</span>
       </div>
       <div class="nb-bar"><div class="nb-fill" id="nb-fill" style="width:0%"></div></div>
-      <div style="font-size:10px;color:rgba(150,180,255,0.5);margin-top:4px" id="nb-cycle">Signal phase: simulated, not live controller data</div>
+      <div style="font-size:10px;color:#718198;margin-top:5px;line-height:1.5" id="nb-cycle">Signal phase: simulated, not live controller data</div>
       <div class="nb-arrive" id="nb-arrive"></div>
     </div>
     <div id="legend">

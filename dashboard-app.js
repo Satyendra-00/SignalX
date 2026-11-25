@@ -267,7 +267,7 @@
     if (!possible.length) return { badge: 'stop', kmph: 0, color: '#ff1744', arriveGreen: false };
     const best = possible.reduce((a, b) => Math.abs(a - 40) <= Math.abs(b - 40) ? a : b);
     const badge = best <= 25 ? 'slow' : 'go';
-    return { badge, kmph: best, color: badge === 'go' ? '#00e676' : '#ffab00', arriveGreen: true };
+    return { badge, kmph: best, color: badge === 'go' ? '#00e676' : '#8b6517', arriveGreen: true };
   }
 
   function nextSignal() {
@@ -281,7 +281,7 @@
   }
 
   function makeSignalMarker(signal, phase) {
-    const color = phase ? (phase.isGreen ? '#00e676' : '#ff1744') : '#ffab00';
+    const color = phase ? (phase.isGreen ? '#217443' : '#ad3c42') : '#8b6517';
     const marker = L.circleMarker([signal.lat, signal.lng], {
       radius: 7, color: '#fff', weight: 2, fillColor: color, fillOpacity: 0.95
     }).addTo(map);
@@ -310,7 +310,7 @@
       const phase = simulatedSignalPhase(plan);
       const rec = !passed && plan ? recommendation(signal.routeDistanceM - routeProgressM, plan) : null;
       const status = passed ? 'PASSED' : phase ? (phase.isGreen ? 'SIM GREEN' : 'SIM RED') : 'SIGNAL';
-      const color = passed ? '#777' : rec ? rec.color : phase ? (phase.isGreen ? '#00e676' : '#ff1744') : '#ffab00';
+      const color = passed ? '#777' : rec ? rec.color : phase ? (phase.isGreen ? '#217443' : '#ad3c42') : '#8b6517';
       const distance = Math.max(0, Math.round(signal.routeDistanceM - routeProgressM));
       const row = document.createElement('div');
       row.className = `jrow${signal === nextSignal() ? ' is-next' : ''}`;
@@ -323,7 +323,7 @@
       row.addEventListener('click', () => map.setView([signal.lat, signal.lng], 17));
       list.appendChild(row);
       const marker = signalMarkers[index] || makeSignalMarker(signal, phase);
-      marker.setStyle({ fillColor: passed ? '#777' : phase ? (phase.isGreen ? '#00e676' : '#ff1744') : '#ffab00' });
+      marker.setStyle({ fillColor: passed ? '#777' : phase ? (phase.isGreen ? '#217443' : '#ad3c42') : '#8b6517' });
       marker.setPopupContent(`<b>${escapeHtml(signal.code ? `${signal.code} — ${signal.displayName}` : signal.displayName)}</b><br>${escapeHtml(signalPhaseText(signal, phase))}<br>OSM traffic signal node`);
     });
     while (signalMarkers.length > routeSignals.length) map.removeLayer(signalMarkers.pop());
@@ -436,7 +436,7 @@
       : SIMULATED_SPEED_KMPH;
     document.getElementById('stat-dist').textContent = Math.round(remaining);
     document.getElementById('stat-rec').textContent = '--';
-    document.getElementById('speed-circle').style.borderColor = '#4fc3f7';
+    document.getElementById('speed-circle').style.borderColor = '#1684a0';
     document.getElementById('stat-rec').style.color = '#b84649';
     const name = document.getElementById('nb-name');
     const now = document.getElementById('nb-now');
@@ -449,12 +449,12 @@
       document.getElementById('stat-signal').style.color = '#218251';
       name.textContent = routeProgressM >= routeData.distanceM ? 'Destination reached' : 'No next mapped signal';
       now.textContent = 'Status: OSM signal sequence';
-      now.style.color = '#4fc3f7';
+      now.style.color = '#167d94';
       time.textContent = `Route left: ${Math.round(remaining)} m`;
       fill.style.width = '0%';
       cycleText.textContent = 'Signal phase: simulated only; no live controller data';
       arrival.textContent = routeProgressM >= routeData.distanceM ? 'End of selected route' : 'No verified next signal on this route';
-      arrival.style.cssText = 'background:rgba(79,195,247,.12);color:#4fc3f7;border:1px solid rgba(79,195,247,.4);font-size:11px;margin-top:8px;padding:5px 8px;border-radius:4px;text-align:center;font-weight:700;';
+      arrival.style.cssText = 'background:rgba(79,195,247,.12);color:#167d94;border:1px solid rgba(22,132,160,.25);font-size:11px;margin-top:8px;padding:5px 8px;border-radius:4px;text-align:center;font-weight:700;';
     } else {
       const distance = Math.max(0, next.routeDistanceM - routeProgressM);
       const plan = getActivePlan(next);
@@ -464,17 +464,17 @@
       document.getElementById('stat-signal').style.color = '#218251';
       name.textContent = next.code ? `${next.code} — ${next.displayName}` : next.displayName;
       now.textContent = phase ? `SIMULATED ${phase.isGreen ? 'GREEN' : 'RED'}` : 'Phase timing unavailable';
-      now.style.color = phase ? (phase.isGreen ? '#00e676' : '#ff1744') : '#ffab00';
+      now.style.color = phase ? (phase.isGreen ? '#217443' : '#ad3c42') : '#8b6517';
       time.textContent = phase ? `Left: ${phase.remaining}s` : 'OSM mapped';
       fill.style.width = phase ? `${Math.min(100, phase.remaining / phase.cycle * 100)}%` : '0%';
-      fill.style.background = phase && phase.isGreen ? '#00e676' : '#ff1744';
+      fill.style.background = phase && phase.isGreen ? '#217443' : '#ad3c42';
       cycleText.textContent = plan
         ? `SIMULATED cycle ${plan.total_cycle_sec}s · local schedule, not live controller data`
         : 'No local signal timing record matched';
       arrival.textContent = rec
         ? rec.arriveGreen ? `Demo estimate: ${rec.kmph} km/h may reach simulated green` : 'Demo estimate: no green arrival speed found'
         : 'No recommendation: verified signal timing is unavailable';
-      arrival.style.cssText = 'background:rgba(79,195,247,.12);color:#c8d8ff;border:1px solid rgba(79,195,247,.4);font-size:11px;margin-top:8px;padding:5px 8px;border-radius:4px;text-align:center;font-weight:700;';
+      arrival.style.cssText = 'background:rgba(79,195,247,.12);color:#3e5873;border:1px solid rgba(22,132,160,.25);font-size:11px;margin-top:8px;padding:5px 8px;border-radius:4px;text-align:center;font-weight:700;';
     }
     if (!gpsTracking) {
       document.getElementById('route-status').classList.remove('error');
