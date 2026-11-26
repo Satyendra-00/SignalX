@@ -345,7 +345,14 @@
       row.addEventListener('click', () => map.setView([signal.lat, signal.lng], 17));
       list.appendChild(row);
       const marker = signalMarkers[index] || makeSignalMarker(signal, phase);
-      marker.setStyle({ fillColor: passed ? '#777' : phase ? (phase.isGreen ? '#217443' : '#ad3c42') : '#8b6517' });
+      const isNext = signal === nextSignal();
+      marker.setStyle({
+        fillColor: passed ? '#777' : phase ? (phase.isGreen ? '#217443' : '#ad3c42') : '#8b6517',
+        radius: isNext ? 9 : 7,
+        opacity: passed ? 0.65 : 1,
+        fillOpacity: passed ? 0.65 : 0.95
+      });
+      if (isNext) marker.bringToFront();
       marker.setPopupContent(`<b>${escapeHtml(signal.code ? `${signal.code} — ${signal.displayName}` : signal.displayName)}</b><br>${escapeHtml(signalPhaseText(signal, phase))}<br>OSM traffic signal node`);
     });
     while (signalMarkers.length > routeSignals.length) map.removeLayer(signalMarkers.pop());
