@@ -197,7 +197,8 @@
     if (vehicleMarker) map.removeLayer(vehicleMarker);
     const start = routeData.coordinates[0];
     vehicleMarker = L.circleMarker([start[1], start[0]], {
-      radius: 8, color: '#fff', fillColor: '#4fc3f7', fillOpacity: 1, weight: 2
+      radius: 8, color: '#fff', fillColor: '#4fc3f7', fillOpacity: 1, weight: 2,
+      className: 'route-vehicle-marker'
     }).addTo(map).bindPopup('Demo vehicle (GPS position is used when enabled)');
     map.fitBounds(L.latLngBounds(latLngs), { padding: [35, 35], maxZoom: 15 });
   }
