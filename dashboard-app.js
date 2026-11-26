@@ -512,7 +512,10 @@
       }
       passed.push([point[1], point[0]]);
       const traveled = routeLineLayers.find(layer => layer.options.className === 'route-line-traveled');
-      if (traveled) traveled.setLatLngs(passed.length > 1 ? passed : [passed[0], passed[0]]);
+      if (traveled) {
+        traveled.setLatLngs(passed.length > 1 ? passed : [passed[0], passed[0]]);
+        traveled.bringToFront();
+      }
     }
   }
 
