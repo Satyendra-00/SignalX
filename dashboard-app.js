@@ -175,6 +175,10 @@
     routeLineLayers.push(routeLine('route-line-flow', {
       color: '#e1f8ff', weight: 2, opacity: 0.95, dashArray: '1 16', dashOffset: '0'
     }));
+    routeLineLayers.push(L.polyline([latLngs[0], latLngs[0]], {
+      color: '#80deea', weight: 5, opacity: 0.95, lineCap: 'round', lineJoin: 'round',
+      className: 'route-line-traveled', interactive: false
+    }).addTo(map));
     const routePath = routeCore.getElement();
     if (routePath && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       const pathLength = routePath.getTotalLength();
@@ -501,6 +505,14 @@
     if (vehicleMarker) {
       const point = routeApi.coordinateAtDistance(routeData.coordinates, routeProgressM, routeData.cumulative);
       vehicleMarker.setLatLng([point[1], point[0]]);
+      const passed = [];
+      for (let index = 0; index < routeData.cumulative.length && routeData.cumulative[index] < routeProgressM; index += 1) {
+        const coordinate = routeData.coordinates[index];
+        passed.push([coordinate[1], coordinate[0]]);
+      }
+      passed.push([point[1], point[0]]);
+      const traveled = routeLineLayers.find(layer => layer.options.className === 'route-line-traveled');
+      if (traveled) traveled.setLatLngs(passed.length > 1 ? passed : [passed[0], passed[0]]);
     }
   }
 
