@@ -170,10 +170,18 @@
     }).addTo(map);
     routeLineLayers.push(routeLine('route-line-glow', { color: '#26c6da', weight: 18, opacity: 0.2 }));
     routeLineLayers.push(routeLine('route-line-casing', { color: '#06172a', weight: 10, opacity: 0.96 }));
-    routeLineLayers.push(routeLine('route-line-core', { color: '#4fc3f7', weight: 5, opacity: 0.98 }));
+    const routeCore = routeLine('route-line-core route-line-reveal', { color: '#4fc3f7', weight: 5, opacity: 0.98 });
+    routeLineLayers.push(routeCore);
     routeLineLayers.push(routeLine('route-line-flow', {
       color: '#e1f8ff', weight: 2, opacity: 0.95, dashArray: '1 16', dashOffset: '0'
     }));
+    const routePath = routeCore.getElement();
+    if (routePath && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const pathLength = routePath.getTotalLength();
+      routePath.style.strokeDasharray = `${pathLength}`;
+      routePath.style.strokeDashoffset = `${pathLength}`;
+      requestAnimationFrame(() => { routePath.style.strokeDashoffset = '0'; });
+    }
     const addEndpoint = (coordinate, title, color) => {
       const marker = L.circleMarker([coordinate[1], coordinate[0]], {
         radius: 7, color: '#fff', weight: 2, fillColor: color, fillOpacity: 1
