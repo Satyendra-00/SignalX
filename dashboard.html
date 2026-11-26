@@ -71,10 +71,12 @@
     .route-line-glow { filter:drop-shadow(0 0 7px rgba(38,198,218,.8)); }
     .route-line-flow { animation:route-dash-flow 1.15s linear infinite; }
     .route-vehicle-marker { filter:drop-shadow(0 0 5px rgba(79,195,247,.95)); animation:route-vehicle-pulse 1.8s ease-in-out infinite; transform-origin:center; }
+    .route-signal-next { animation:route-signal-pulse 1.2s ease-in-out infinite; transform-origin:center; }
     @keyframes route-vehicle-pulse { 50% { filter:drop-shadow(0 0 10px rgba(79,195,247,1)); } }
+    @keyframes route-signal-pulse { 50% { filter:drop-shadow(0 0 7px rgba(255,255,255,.9)); } }
     @keyframes route-dash-flow { to { stroke-dashoffset:-34px; } }
     @media (prefers-reduced-motion: reduce) {
-      .route-line-flow, .route-vehicle-marker { animation:none; }
+      .route-line-flow, .route-vehicle-marker, .route-signal-next { animation:none; }
       .route-line-flow { stroke-dasharray:1 18; }
     }
     #map-tile-error { position:absolute; top:66px; left:50%; transform:translateX(-50%); z-index:450; max-width:calc(100% - 24px); padding:8px 12px; border:1px solid rgba(255,171,0,0.55); border-radius:6px; background:rgba(10,15,35,0.94); color:#ffcc80; font-size:12px; text-align:center; }

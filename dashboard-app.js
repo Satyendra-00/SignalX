@@ -305,7 +305,7 @@
   function makeSignalMarker(signal, phase) {
     const color = phase ? (phase.isGreen ? '#217443' : '#ad3c42') : '#8b6517';
     const marker = L.circleMarker([signal.lat, signal.lng], {
-      radius: 7, color: '#fff', weight: 2, fillColor: color, fillOpacity: 0.95
+      radius: 7, color: '#fff', weight: 2, fillColor: color, fillOpacity: 0.95, className: 'route-signal-marker'
     }).addTo(map);
     const label = signal.code ? `${signal.code} — ${signal.displayName}` : signal.displayName;
     marker.bindPopup(`<b>${escapeHtml(label)}</b><br>${escapeHtml(signalPhaseText(signal, phase))}<br>OSM traffic signal node`);
@@ -352,6 +352,8 @@
         opacity: passed ? 0.65 : 1,
         fillOpacity: passed ? 0.65 : 0.95
       });
+      const markerElement = marker.getElement();
+      if (markerElement) markerElement.classList.toggle('route-signal-next', isNext);
       if (isNext) marker.bringToFront();
       marker.setPopupContent(`<b>${escapeHtml(signal.code ? `${signal.code} — ${signal.displayName}` : signal.displayName)}</b><br>${escapeHtml(signalPhaseText(signal, phase))}<br>OSM traffic signal node`);
     });
